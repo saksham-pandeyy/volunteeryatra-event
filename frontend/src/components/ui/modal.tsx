@@ -53,14 +53,14 @@ export function Modal({
     >
       <div
         className={clsx(
-          "bg-white rounded-[12px] shadow-xl w-full max-w-sm p-6 relative border border-slate-100 transform transition-all duration-200",
+          "bg-surface rounded-[12px] shadow-xl w-full max-w-sm p-6 relative border border-surface-border transform transition-all duration-200",
           className
         )}
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors cursor-pointer focus:outline-none"
+          className="absolute right-4 top-4 rounded-full p-1 text-muted hover:bg-surface-hover hover:text-foreground transition-colors cursor-pointer focus:outline-none"
           aria-label="Close modal"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -75,7 +75,7 @@ export function Modal({
             </div>
           )}
           {title && (
-            <h2 className="text-xl font-bold text-slate-800 mb-3">{title}</h2>
+            <h2 className="text-xl font-bold text-foreground mb-3">{title}</h2>
           )}
           <div className="w-full">
             {children}

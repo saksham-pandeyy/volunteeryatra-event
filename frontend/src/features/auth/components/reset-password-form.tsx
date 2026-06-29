@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button, Input, AuthAlert } from "@/components/ui";
+import { notify } from "@/common/utils";
+import { Button, Input, SkeletonForm, SkeletonText } from "@/components/ui";
 import { useResetPasswordMutation } from "../services";
 import { z } from "zod";
 
@@ -17,7 +18,7 @@ const schema = z.object({
 
 interface FormErrors { password?: string; confirmPassword?: string }
 
-export function ResetPasswordForm() {
+function ResetPasswordFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams ? searchParams.get("token") : null;
@@ -25,15 +26,13 @@ export function ResetPasswordForm() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
-  const [apiError, setApiError] = useState("");
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setApiError("");
     
     if (!token) {
-      setApiError("Invalid or missing reset token. Please request a new link.");
+      notify.error("Invalid or missing reset token. Please request a new link.");
       return;
     }
 
@@ -49,26 +48,28 @@ export function ResetPasswordForm() {
     }
     setErrors({});
 
-    resetPassword({ token, password }).unwrap()
-      .then(() => {
-        router.push("/login?success=Password+has+been+reset+successfully.");
-      })
-      .catch((err: any) => {
-        const msg = err?.data?.error?.message || err?.data?.message || "Failed to reset password. Please try again.";
-        setApiError(msg);
-      });
+    try {
+      await resetPassword({ token, password }).unwrap();
+      notify.success("Password has been reset successfully. Please login.");
+      setTimeout(() => router.push("/login"), 1000);
+    } catch (err: any) {
+      const msg = err?.data?.error?.message || "Failed to reset password. Please try again.";
+      notify.error(msg);
+    }
   };
 
   return (
     <div className="guest-form-container w-full">
-      <h2 className="text-2xl font-bold mb-6 text-center text-[#0f172a] tracking-wider uppercase">
+      <h2 className="text-2xl font-bold mb-6 text-center text-foreground tracking-wider uppercase">
         Reset Password
       </h2>
 
       {!token ? (
         <div className="space-y-4">
-          <AuthAlert type="error" message="Missing or invalid token. Please check your email link or send a new request." />
-          <p className="text-muted mt-6 text-center text-[#475569]">
+          <div className="rounded-lg bg-danger-muted border border-danger/20 p-4">
+            <p className="text-sm text-danger font-medium">Missing or invalid token. Please check your email link or send a new request.</p>
+          </div>
+          <p className="text-muted mt-6 text-center">
             <Link href="/forgot-password" className="text-primary hover:underline font-semibold">
               Go to Forgot Password
             </Link>
@@ -76,11 +77,9 @@ export function ResetPasswordForm() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
-          <p className="text-sm text-slate-500 mb-4 text-center">
+          <p className="text-sm text-muted mb-4 text-center">
             Please choose a new secure password.
           </p>
-
-          {apiError && <AuthAlert type="error" message={apiError} />}
 
           <Input
             label="New Password"
@@ -104,7 +103,7 @@ export function ResetPasswordForm() {
             Reset Password
           </Button>
 
-          <p className="text-muted mt-6 text-center text-[#475569]">
+          <p className="text-muted mt-6 text-center">
             Back to{" "}
             <Link href="/login" className="text-primary hover:underline font-semibold">
               Sign In
@@ -113,5 +112,18 @@ export function ResetPasswordForm() {
         </form>
       )}
     </div>
+  );
+}
+
+export function ResetPasswordForm() {
+  return (
+    <Suspense fallback={
+      <div className="guest-form-container w-full space-y-4">
+        <SkeletonText className="mx-auto w-48 h-8 mb-6" />
+        <SkeletonForm fields={2} />
+      </div>
+    }>
+      <ResetPasswordFormContent />
+    </Suspense>
   );
 }

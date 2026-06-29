@@ -19,6 +19,12 @@ export const createEventSchema = z.object({
     "Invalid date format"
   ),
   location: z.string().optional(),
+  category: z.string().optional(),
+  max_participants: z.number().int("Must be a whole number").positive("Must be at least 1").optional(),
+  registration_deadline: z.string().optional(),
+  start_time: z.string().optional(),
+  end_time: z.string().optional(),
+  cover_image_url: z.string().optional(),
 });
 
 export const updateEventSchema = createEventSchema.partial();

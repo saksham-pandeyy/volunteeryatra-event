@@ -7,9 +7,9 @@ export function useEventList() {
   const [sortAsc, setSortAsc] = useState(true);
   const { data, isLoading, error } = useListEventsQuery({ ...filters, sortAsc });
   const [deleteEvent, { isLoading: deleteLoading }] = useDeleteEventMutation();
-  const events = data?.success ? data.data : [];
+  const events = data ?? [];
 
-  const handleDelete = async (eventId: string) => { try { await deleteEvent(eventId).unwrap(); } catch { /* handled by cache */ } };
+  const handleDelete = async (eventId: string) => { try { await deleteEvent(eventId).unwrap(); } catch {} };
   const handleSearch = (name: string) => setFilters((prev) => ({ ...prev, name: name || undefined }));
   const handleFilterDate = (date: string) => setFilters((prev) => ({ ...prev, date: date || undefined }));
   const toggleSort = () => setSortAsc((prev) => !prev);

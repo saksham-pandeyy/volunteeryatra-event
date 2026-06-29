@@ -1,4 +1,5 @@
 export type { Event, EventFilters, EventStatus, ListEventsResponse, DashboardStats, CreateEventPayload, UpdateEventPayload } from "./event";
+export { EVENT_CATEGORIES } from "./event";
 export type { Participant, ParticipantStatus, ApplyToEventPayload, CancelRegistrationPayload, ListParticipantsResponse } from "./participant";
 export type { User } from "./user";
 export type { LoginPayload, RegisterPayload, AuthResponse } from "./auth";

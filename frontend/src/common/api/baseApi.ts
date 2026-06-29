@@ -1,4 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { notify } from "@/common/utils";
+import type { ApiResponse } from "@/common/types";
+
+export function transformResponse<T>(response: ApiResponse<T>): T {
+  return response.data;
+}
 
 export const baseApi = createApi({
   reducerPath: "api",
@@ -17,3 +23,18 @@ export const baseApi = createApi({
   tagTypes: ["Events", "Event", "Participants", "User", "DashboardStats"],
   endpoints: () => ({}),
 });
+
+export const authErrorMiddleware = (api: any) => (next: any) => (action: any) => {
+  if (action?.error && action?.payload?.status === 401) {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      if (token) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        notify.error("Session expired. Please login again.");
+        window.location.href = "/login";
+      }
+    }
+  }
+  return next(action);
+};

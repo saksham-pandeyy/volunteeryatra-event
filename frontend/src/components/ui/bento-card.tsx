@@ -4,6 +4,14 @@ import type { ReactNode, ComponentType } from "react";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 
+export function BentoGrid({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return (
+    <div className={`grid grid-cols-1 gap-4 md:grid-cols-6 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
 interface BentoCardProps {
   title: string;
   subtitle?: string;

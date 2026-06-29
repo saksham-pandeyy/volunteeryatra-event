@@ -1,24 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
+import { notify } from "@/common/utils";
 import { useAuth } from "../hooks";
 import { registerSchema } from "@/common/utils";
-import { Button, Input, AuthAlert } from "@/components/ui";
+import { Button, Input, SkeletonForm, SkeletonText } from "@/components/ui";
 
 interface FormErrors { name?: string; email?: string; password?: string }
 
-export function RegisterForm() {
+function RegisterFormContent() {
   const { register, registerLoading } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
-  const [apiError, setApiError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setApiError("");
+    setErrors({});
     const result = registerSchema.safeParse({ name, email, password });
     if (!result.success) {
       const fieldErrors: FormErrors = {};
@@ -29,25 +29,21 @@ export function RegisterForm() {
       setErrors(fieldErrors);
       return;
     }
-    setErrors({});
-    register(name, email, password)
-      .catch((err: unknown) => {
-        const error = err as { data?: { error?: { message?: string } } };
-        setApiError(error?.data?.error?.message || "Registration failed");
-      });
+    try {
+      await register(name, email, password);
+    } catch (err: unknown) {
+      const error = err as { data?: { error?: { message?: string } } };
+      notify.error(error?.data?.error?.message || "Registration failed. Please try again.");
+    }
   };
 
   return (
     <div className="guest-form-container w-full">
-      <h2 className="text-2xl font-bold mb-6 text-center text-[#0f172a] tracking-wider uppercase">
+      <h2 className="text-2xl font-bold mb-6 text-center text-foreground tracking-wider uppercase">
         Create Account
       </h2>
       
       <form onSubmit={handleSubmit} className="space-y-4">
-        {apiError && (
-          <AuthAlert type="error" message={apiError} />
-        )}
-        
         <Input 
           label="Name" 
           value={name} 
@@ -79,12 +75,25 @@ export function RegisterForm() {
         </Button>
       </form>
 
-      <p className="text-muted mt-6 text-center text-[#475569]">
+      <p className="text-muted mt-6 text-center">
         Already have an account?{" "}
         <Link href="/login" className="text-primary hover:underline font-semibold">
           Sign In
         </Link>
       </p>
     </div>
+  );
+}
+
+export function RegisterForm() {
+  return (
+    <Suspense fallback={
+      <div className="guest-form-container w-full space-y-4">
+        <SkeletonText className="mx-auto w-40 h-8 mb-6" />
+        <SkeletonForm fields={3} />
+      </div>
+    }>
+      <RegisterFormContent />
+    </Suspense>
   );
 }

@@ -1,32 +1,43 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUpdateEventMutation, useGetEventQuery } from "../services";
-import { updateEventSchema } from "@/common/utils";
+import { updateEventSchema, notify } from "@/common/utils";
 import type { UpdateEventPayload } from "@/common/types";
 
-interface FormErrors { name?: string; description?: string; date?: string; location?: string }
+interface FormErrors { name?: string; description?: string; date?: string; location?: string; category?: string; max_participants?: string; registration_deadline?: string; start_time?: string; end_time?: string; cover_image_url?: string }
 
 export function useUpdateEvent(eventId: string) {
   const router = useRouter();
   const { data: eventData } = useGetEventQuery(eventId, { skip: !eventId });
   const [form, setForm] = useState<UpdateEventPayload>({});
   const [errors, setErrors] = useState<FormErrors>({});
-  const [apiError, setApiError] = useState("");
   const [updateEvent, { isLoading }] = useUpdateEventMutation();
-  const event = eventData?.success ? eventData.data : null;
+  const event = eventData ?? null;
 
   useEffect(() => {
-    if (event) setForm({ name: event.name, description: event.description || "", date: event.date, location: event.location || "" });
+    if (event) {
+      setForm({
+        name: event.name,
+        description: event.description || "",
+        date: event.date,
+        location: event.location || "",
+        category: event.category || "other",
+        max_participants: event.max_participants ?? undefined,
+        start_time: event.start_time ?? undefined,
+        end_time: event.end_time ?? undefined,
+        registration_deadline: event.registration_deadline ?? undefined,
+        cover_image_url: event.cover_image_url ?? undefined,
+      });
+    }
   }, [event]);
 
-  const setField = (field: keyof UpdateEventPayload, value: string) => {
+  const setField = (field: keyof UpdateEventPayload, value: string | number) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setApiError("");
     const result = updateEventSchema.safeParse(form);
     if (!result.success) {
       const fieldErrors: FormErrors = {};
@@ -34,11 +45,16 @@ export function useUpdateEvent(eventId: string) {
       setErrors(fieldErrors);
       return;
     }
-    try { await updateEvent({ eventId, data: form }).unwrap(); router.push(`/events/${eventId}`); } catch (err: unknown) {
+    setErrors({});
+    try {
+      await updateEvent({ eventId, data: form }).unwrap();
+      notify.success("Event updated successfully!");
+      setTimeout(() => router.push(`/events/${eventId}`), 300);
+    } catch (err: unknown) {
       const error = err as { data?: { error?: { message?: string } } };
-      setApiError(error?.data?.error?.message || "Failed to update event");
+      notify.error(error?.data?.error?.message || "Failed to update event");
     }
   };
 
-  return { form, errors, apiError, isLoading, event, setField, handleSubmit };
+  return { form, errors, isLoading, event, setField, handleSubmit };
 }

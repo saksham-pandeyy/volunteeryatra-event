@@ -161,7 +161,7 @@
   }
 
   .card-surface:hover {
-    border-color: var(--color-base-700);
+    border-color: var(--color-primary-ring);
   }
 
   .card-elevated {
@@ -298,20 +298,25 @@
     border-radius: var(--radius-sm);
     background: linear-gradient(
       90deg,
-      var(--color-surface) 25%,
-      var(--color-surface-hover) 50%,
-      var(--color-surface) 75%
+      var(--color-surface) 0%,
+      var(--color-surface-hover) 40%,
+      var(--color-surface-active) 50%,
+      var(--color-surface-hover) 60%,
+      var(--color-surface) 100%
     );
-    background-size: 200% 100%;
-    animation: skeleton-shimmer 1.5s ease-in-out infinite;
+    background-size: 300% 100%;
+    animation: skeleton-shimmer 2s ease-in-out infinite;
   }
 
   @keyframes skeleton-shimmer {
     0% {
-      background-position: 200% 0;
+      background-position: 300% 0;
+    }
+    50% {
+      background-position: -100% 0;
     }
     100% {
-      background-position: -200% 0;
+      background-position: -300% 0;
     }
   }
 
@@ -375,5 +380,131 @@
   .loading-dot:nth-child(2) {
     animation-delay: -0.16s;
   }
+
+  /* Big Loading Dots Animation */
+  .loading-dots-big {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    height: 32px;
+  }
+
+  .loading-dot-big {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    animation: loadingBounce 1.2s ease-in-out infinite;
+  }
+
+  .loading-dot-big.dot-green {
+    background-color: var(--color-primary);
+    animation-delay: 0s;
+  }
+  .loading-dot-big.dot-blue {
+    background-color: var(--color-accent-blue);
+    animation-delay: 0.15s;
+  }
+  .loading-dot-big.dot-amber {
+    background-color: var(--color-accent-amber);
+    animation-delay: 0.3s;
+  }
+  .loading-dot-big.dot-rose {
+    background-color: var(--color-accent-rose);
+    animation-delay: 0.45s;
+  }
+  .loading-dot-big.dot-purple {
+    background-color: var(--color-accent-purple);
+    animation-delay: 0.6s;
+  }
+
+  @keyframes loadingBounce {
+    0%, 80%, 100% {
+      transform: scale(0.6);
+      opacity: 0.3;
+    }
+    40% {
+      transform: scale(1.2);
+      opacity: 1;
+    }
+  }
+
+  /* Navigation Progress Bar */
+  @keyframes progressBar {
+    0% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .navigation-progress-bar {
+    height: 100%;
+    width: 50%;
+    background: linear-gradient(
+      90deg,
+      var(--color-primary) 0%,
+      var(--color-accent-blue) 25%,
+      var(--color-accent-amber) 50%,
+      var(--color-accent-rose) 75%,
+      var(--color-accent-purple) 100%
+    );
+    animation: progressBar 1.5s ease-in-out infinite;
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* Card hover lift */
+  .card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Gradient text */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Stats highlight accent bar */
+  .accent-bar {
+    position: relative;
+    overflow: hidden;
+  }
+  .accent-bar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--accent, var(--color-primary));
+    opacity: 0.6;
+  }
+
+  /* Slow fade in for page content */
+  @keyframes pageEnter {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .page-enter {
+    animation: pageEnter 0.3s ease-out forwards;
+  }
+
 }
 

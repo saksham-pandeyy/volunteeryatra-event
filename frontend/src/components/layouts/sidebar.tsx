@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { LayoutDashboard, Calendar, LogOut } from "lucide-react";
+import { LayoutDashboard, Calendar, Settings, LogOut } from "lucide-react";
 
 interface SidebarProps {
   user: any;
@@ -11,24 +11,23 @@ interface SidebarProps {
 }
 
 const navItems = [
-  {
-    href: "/dashboard",
-    label: "Dashboard",
-    icon: <LayoutDashboard className="h-5 w-5" />,
-  },
-  {
-    href: "/events",
-    label: "Events",
-    icon: <Calendar className="h-5 w-5" />,
-  },
+  { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+  { href: "/events", label: "Events", icon: <Calendar className="h-5 w-5" /> },
+  { href: "/settings", label: "Settings", icon: <Settings className="h-5 w-5" /> },
 ];
 
 export function Sidebar({ user, onLogoutClick }: SidebarProps) {
   const pathname = usePathname();
-  const isActive = (href: string) => href === "/events" ? pathname.startsWith("/events") : pathname.startsWith(href);
+  const isActive = (href: string) =>
+    href === "/events" ? pathname.startsWith("/events") :
+    href === "/settings" ? pathname.startsWith("/settings") :
+    pathname.startsWith(href);
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") || "http://localhost:4000";
+  const avatarSrc = user?.avatar_url ? `${apiUrl}${user.avatar_url}` : null;
 
   return (
-    <aside 
+    <aside
       className="sidebar-dark"
       style={{
         width: "260px",
@@ -38,9 +37,8 @@ export function Sidebar({ user, onLogoutClick }: SidebarProps) {
         display: "flex",
         flexDirection: "column",
         flexShrink: 0,
-      }}
-    >
-      <div 
+      }}      >
+      <div
         style={{
           height: "64px",
           display: "flex",
@@ -54,45 +52,26 @@ export function Sidebar({ user, onLogoutClick }: SidebarProps) {
           <img
             src="/Logo.png"
             alt="Volunteer Yatra Logo"
-            style={{
-              height: "28px",
-              width: "auto",
-              objectFit: "contain",
-              filter: "invert(1) brightness(10)",
-            }}
+            style={{ height: "28px", width: "auto", objectFit: "contain", filter: "invert(1) brightness(10)" }}
           />
         </Link>
       </div>
 
-      <nav style={{ flex: 1, padding: "24px 12px", display: "flex", flexDirection: "column", gap: "6px" }}>
+      <nav style={{ flex: 1, padding: "24px 12px", display: "flex", flexDirection: "column", gap: "4px" }}>
         {navItems.map((item) => {
           const active = isActive(item.href);
           return (
-            <Link 
-              key={item.href} 
-              href={item.href} 
+            <Link
+              key={item.href}
+              href={item.href}
               className={clsx(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors cursor-pointer"
+                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all no-underline",
+                active
+                  ? "bg-surface-active text-foreground"
+                  : "text-muted hover:bg-surface-hover hover:text-foreground"
               )}
-              style={{
-                backgroundColor: active ? "var(--color-surface-active)" : "transparent",
-                color: active ? "var(--color-foreground)" : "var(--color-muted)",
-                textDecoration: "none",
-              }}
-              onMouseEnter={(e) => {
-                if (!active) {
-                  e.currentTarget.style.backgroundColor = "var(--color-surface-hover)";
-                  e.currentTarget.style.color = "var(--color-foreground)";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!active) {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                  e.currentTarget.style.color = "var(--color-muted)";
-                }
-              }}
             >
-              <span style={{ display: "flex", alignItems: "center", color: active ? "var(--color-primary)" : "inherit" }}>
+              <span className={clsx("flex items-center", active && "text-primary")}>
                 {item.icon}
               </span>
               <span>{item.label}</span>
@@ -101,44 +80,50 @@ export function Sidebar({ user, onLogoutClick }: SidebarProps) {
         })}
       </nav>
 
-      <div 
+      <div
         style={{
           borderTop: "1px solid var(--color-surface-border)",
-          padding: "16px",
+          padding: "14px 16px",
           backgroundColor: "var(--color-background)",
           display: "flex",
           alignItems: "center",
           gap: "12px",
         }}
       >
-        <div 
+        <div
           style={{
-            height: "36px",
-            width: "36px",
+            height: "38px",
+            width: "38px",
             borderRadius: "50%",
+            overflow: "hidden",
             backgroundColor: "var(--color-primary)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "14px",
-            fontWeight: "bold",
-            color: "#ffffff",
             flexShrink: 0,
           }}
         >
-          {user?.name?.charAt(0)?.toUpperCase() || "U"}
+          {avatarSrc ? (
+            <img src={avatarSrc} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <span style={{ fontSize: "15px", fontWeight: "bold", color: "#ffffff" }}>
+              {user?.name?.charAt(0)?.toUpperCase() || "U"}
+            </span>
+          )}
         </div>
+
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: "14px", fontWeight: 600, color: "var(--color-foreground)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <p style={{ margin: 0, fontSize: "13px", fontWeight: 600, color: "var(--color-foreground)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {user?.name || "User"}
           </p>
-          <p style={{ margin: 0, fontSize: "12px", color: "var(--color-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <p style={{ margin: 0, fontSize: "11px", color: "var(--color-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {user?.email || ""}
           </p>
         </div>
-        <button 
-          onClick={onLogoutClick} 
-          className="transition-colors cursor-pointer"
+
+        <button
+          onClick={onLogoutClick}
+          className="cursor-pointer transition-all"
           style={{
             background: "none",
             border: "none",
@@ -151,15 +136,15 @@ export function Sidebar({ user, onLogoutClick }: SidebarProps) {
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.backgroundColor = "var(--color-surface-hover)";
-            e.currentTarget.style.color = "var(--color-foreground)";
+            e.currentTarget.style.color = "var(--color-danger)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = "transparent";
             e.currentTarget.style.color = "var(--color-muted)";
           }}
-          title="Logout"
+          title="Sign Out"
         >
-          <LogOut className="h-5 w-5" />
+          <LogOut size={16} strokeWidth={1.75} />
         </button>
       </div>
     </aside>

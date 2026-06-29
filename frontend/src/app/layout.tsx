@@ -20,12 +20,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Provider store={store}>
           {children}
           <Toaster
-            position="bottom-right"
+            position="top-right"
+            richColors
+            closeButton
             toastOptions={{
               style: {
                 background: "var(--color-surface-elevated)",
                 border: "1px solid var(--color-surface-border)",
                 color: "var(--color-foreground)",
+                fontSize: "13px",
               },
             }}
           />
