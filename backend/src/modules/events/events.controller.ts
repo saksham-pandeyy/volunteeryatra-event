@@ -30,6 +30,12 @@ const createSchema = z.object({
   description: z.string().optional(),
   date: z.string().min(1),
   location: z.string().optional(),
+  category: z.string().optional(),
+  max_participants: z.number().int().positive().optional(),
+  registration_deadline: z.string().optional(),
+  start_time: z.string().optional(),
+  end_time: z.string().optional(),
+  cover_image_url: z.string().optional(),
 });
 
 const updateSchema = createSchema.partial();
@@ -152,8 +158,47 @@ export async function stats(
   next: NextFunction
 ): Promise<void> {
   try {
-    const data = await getDashboardStats();
+    const from = parseQuery(req.query.from);
+    const to = parseQuery(req.query.to);
+    const data = await getDashboardStats(from, to);
     res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function exportCsv(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const filters: EventFilters = {
+      name: parseQuery(req.query.name),
+      date: parseQuery(req.query.date),
+      location: parseQuery(req.query.location),
+      status: parseQuery(req.query.status) as EventStatus | undefined,
+      sortAsc: parseQuery(req.query.sort) !== "desc",
+    };
+    const events = await findAllEvents(filters);
+    
+    const headers = ["Name","Description","Date","Location","Status","Category","Max Participants","Created At"];
+    const rows = events.map((e) => [
+      `"${(e.name || "").replace(/"/g, """ )}"`,
+      `"${(e.description || "").replace(/"/g, """ )}"`,
+      e.date,
+      `"${(e.location || "").replace(/"/g, """ )}"`,
+      e.status,
+      e.category,
+      e.max_participants?.toString() || "",
+      e.created_at,
+    ]);
+    
+    const csv = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename="events-export-${new Date().toISOString().split("T")[0]}.csv"`);
+    res.send(csv);
   } catch (error) {
     next(error);
   }

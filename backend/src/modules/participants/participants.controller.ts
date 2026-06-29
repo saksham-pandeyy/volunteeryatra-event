@@ -9,6 +9,7 @@ import {
 } from "./participants.model";
 import { findEventById } from "../events/events.model";
 import { NotFoundError, ForbiddenError } from "../../shared/errors";
+import { sendEmail, registrationConfirmationHtml } from "../../services/email";
 
 const applySchema = z.object({
   name: z.string().min(1),
@@ -35,12 +36,42 @@ export async function apply(
     const event = await findEventById(eventId);
     if (!event) throw new NotFoundError("Event");
 
+    // Check max participants
+    if (event.max_participants) {
+      const participants = await findParticipantsByEvent(eventId);
+      if (participants.length >= event.max_participants) {
+        res.status(400).json({ success: false, error: { code: "EVENT_FULL", message: "This event has reached its maximum capacity" } });
+        return;
+      }
+    }
+
+    // Check registration deadline
+    if (event.registration_deadline) {
+      const deadline = new Date(event.registration_deadline);
+      if (new Date() > deadline) {
+        res.status(400).json({ success: false, error: { code: "DEADLINE_PASSED", message: "Registration deadline has passed" } });
+        return;
+      }
+    }
+
     const body = applySchema.parse(req.body);
     const participant = await applyToEvent({
       event_id: eventId,
       user_id: req.userId!,
       ...body,
     });
+
+    // Send confirmation email (fire-and-forget — don't block response)
+    const eventDate = event.date 
+      ? new Date(event.date).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+      : "TBD";
+    
+    sendEmail({
+      to: body.email,
+      subject: `Confirmed! You're registered for ${event.name}`,
+      html: registrationConfirmationHtml(event.name, body.name, eventDate, event.location),
+    });
+
     res.status(201).json({ success: true, data: participant });
   } catch (error) {
     next(error);

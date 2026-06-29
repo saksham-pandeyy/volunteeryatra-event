@@ -37,12 +37,27 @@ export async function findUserById(
 ): Promise<Omit<UserRow, "password"> | null> {
   const { data, error } = await supabase
     .from("users")
-    .select("id, email, name, created_at")
+    .select("id, email, name, avatar_url, created_at")
     .eq("id", id)
     .single();
 
   if (error && error.code !== "PGRST116") throw new DatabaseError(error.message);
   return data || null;
+}
+
+export async function updateUserProfile(
+  userId: string,
+  updates: { name?: string; avatar_url?: string | null }
+): Promise<Omit<UserRow, "password">> {
+  const { data, error } = await supabase
+    .from("users")
+    .update(updates)
+    .eq("id", userId)
+    .select("id, email, name, avatar_url, created_at")
+    .single();
+
+  if (error) throw new DatabaseError(error.message);
+  return data;
 }
 
 export async function validatePassword(

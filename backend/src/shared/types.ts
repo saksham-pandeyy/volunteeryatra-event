@@ -3,6 +3,7 @@ export interface UserRow {
   email: string;
   password: string;
   name: string;
+  avatar_url: string | null;
   created_at: string;
 }
 
@@ -18,6 +19,12 @@ export interface EventRow {
   owner_id: string;
   created_at: string;
   updated_at: string;
+  category: string;
+  max_participants: number | null;
+  registration_deadline: string | null;
+  start_time: string | null;
+  end_time: string | null;
+  cover_image_url: string | null;
 }
 
 export interface ParticipantRow {
@@ -39,4 +46,5 @@ export interface DashboardStats {
   avgPerEvent: number;
   byStatus: { backlog: number; in_progress: number; completed: number };
   monthlyTrend: Array<{ label: string; count: number }>;
+  dateRangeLabel: string;
 }

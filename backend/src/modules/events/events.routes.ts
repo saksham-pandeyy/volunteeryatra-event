@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authenticate } from "../../middleware/authenticate";
 import { validate } from "../../middleware/validate";
 import { z } from "zod";
-import { list, getById, create, update, updateStatus, remove, stats } from "./events.controller";
+import { list, getById, create, update, updateStatus, remove, stats, exportCsv } from "./events.controller";
 
 const createSchema = z.object({
   name: z.string().min(1),
@@ -22,6 +22,7 @@ const router = Router();
 router.use(authenticate);
 
 router.get("/stats", stats);
+router.get("/export/csv", exportCsv);
 router.get("/", list);
 router.get("/:eventId", getById);
 router.post("/", validate(createSchema), create);

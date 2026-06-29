@@ -2,8 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 import { environment } from "../../config/environment";
-import { createUser, findUserByEmail, findUserById, validatePassword, updateUserPassword } from "./auth.model";
+import { createUser, findUserByEmail, findUserById, validatePassword, updateUserPassword, updateUserProfile } from "./auth.model";
 import { AuthenticationError, NotFoundError } from "../../shared/errors";
+import type { AuthenticatedRequest } from "../../middleware/authenticate";
 
 const registerSchema = z.object({
   email: z.string().email(),
@@ -64,13 +65,63 @@ export async function login(
 }
 
 export async function me(
-  req: Request & { userId?: string },
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
     const user = await findUserById(req.userId!);
     if (!user) throw new NotFoundError("User");
+    res.json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+}
+
+const updateProfileSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters").optional(),
+  avatar_url: z.string().nullable().optional(),
+});
+
+export async function updateProfile(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const updates = updateProfileSchema.parse(req.body);
+    const user = await updateUserProfile(req.userId!, updates);
+    res.json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function uploadAvatar(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    if (!req.file) {
+      res.status(400).json({ success: false, error: { code: "BAD_REQUEST", message: "No file uploaded" } });
+      return;
+    }
+    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+    const user = await updateUserProfile(req.userId!, { avatar_url: avatarUrl });
+    res.json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function removeAvatar(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const user = await updateUserProfile(req.userId!, { avatar_url: null });
     res.json({ success: true, data: user });
   } catch (error) {
     next(error);

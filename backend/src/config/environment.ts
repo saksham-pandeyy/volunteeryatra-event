@@ -7,4 +7,7 @@ export const environment = {
   supabaseUrl: process.env.SUPABASE_URL || "",
   supabaseAnonKey: process.env.SUPABASE_ANON_KEY || "",
   jwtSecret: process.env.JWT_SECRET || "default-secret-change-in-production",
+  resendApiKey: process.env.RESEND_API_KEY || "",
+  emailFrom: process.env.EMAIL_FROM || "Volunteer Yatra <onboarding@resend.dev>",
+  frontendUrl: process.env.FRONTEND_URL || "http://localhost:3000",
 };
