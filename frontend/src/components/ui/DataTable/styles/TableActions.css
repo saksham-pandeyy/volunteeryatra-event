@@ -1,0 +1,213 @@
+/* ===== TABLE ACTIONS & COPYABLE ===== */
+.dt-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  white-space: nowrap;
+  padding: 0 var(--space-3);
+}
+
+.dt-action-btn {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-base);
+  cursor: pointer;
+  transition: all var(--transition-fast) var(--ease-out);
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  position: relative;
+  overflow: hidden;
+}
+
+.dt-action-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: none;
+}
+
+.dt-action-btn:hover::after {
+  left: 100%;
+  transition: left 0.6s ease;
+}
+
+.dt-action-btn:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--primary);
+}
+
+.dt-action-view {
+  background: color-mix(in srgb, var(--info) 8%, var(--bg-surface));
+  color: var(--info);
+  border-color: color-mix(in srgb, var(--info) 20%, var(--border-base));
+}
+
+.dt-action-view:hover {
+  background: var(--info);
+  color: white;
+  border-color: var(--info);
+}
+
+.dt-action-edit {
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-surface));
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 20%, var(--border-base));
+}
+
+.dt-action-edit:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.dt-action-success {
+  background: color-mix(in srgb, var(--success) 8%, var(--bg-surface));
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 20%, var(--border-base));
+}
+
+.dt-action-success:hover {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
+}
+
+.dt-action-warning {
+  background: color-mix(in srgb, var(--warning) 8%, var(--bg-surface));
+  color: var(--warning);
+  border-color: color-mix(in srgb, var(--warning) 20%, var(--border-base));
+}
+
+.dt-action-warning:hover {
+  background: var(--warning);
+  color: white;
+  border-color: var(--warning);
+}
+
+.dt-action-power--active {
+  background: color-mix(in srgb, var(--warning) 8%, var(--bg-surface));
+  color: var(--warning);
+  border-color: color-mix(in srgb, var(--warning) 20%, var(--border-base));
+}
+
+.dt-action-power--active:hover {
+  background: var(--warning);
+  color: white;
+  border-color: var(--warning);
+}
+
+.dt-action-power--inactive {
+  background: color-mix(in srgb, var(--success) 8%, var(--bg-surface));
+  color: var(--success);
+  border-color: color-mix(in srgb, var(--success) 20%, var(--border-base));
+}
+
+.dt-action-power--inactive:hover {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
+}
+
+.dt-action-danger,
+.dt-action-delete {
+  background: color-mix(in srgb, var(--error) 8%, var(--bg-surface));
+  color: var(--error);
+  border-color: color-mix(in srgb, var(--error) 20%, var(--border-base));
+}
+
+.dt-action-danger:hover,
+.dt-action-delete:hover {
+  background: var(--error);
+  color: white;
+  border-color: var(--error);
+}
+
+.dt-action-primary {
+  background: color-mix(in srgb, var(--primary) 8%, var(--bg-surface));
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 20%, var(--border-base));
+}
+
+.dt-action-primary:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.dt-action-info {
+  background: color-mix(in srgb, var(--info) 8%, var(--bg-surface));
+  color: var(--info);
+  border-color: color-mix(in srgb, var(--info) 20%, var(--border-base));
+}
+
+.dt-action-info:hover {
+  background: var(--info);
+  color: white;
+  border-color: var(--info);
+}
+
+.dt-action-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* ===== COPYABLE ===== */
+.dt-copyable {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.dt-code {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--text-xs);
+  padding: var(--space-1) var(--space-2);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+  border: 1px solid var(--border-base);
+}
+
+.dt-copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast) var(--ease-out);
+}
+
+.dt-copy-btn:hover {
+  background: var(--bg-elevated);
+  color: var(--primary);
+}
+
+@media print {
+  .dt-actions {
+    display: none !important;
+  }
+}
+
+

@@ -1,0 +1,47 @@
+/* ===== DATA TABLE BASE ===== */
+.dt-root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: var(--space-4);
+}
+
+.dt-container {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-base);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.dt-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  position: relative;
+}
+
+.dt-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.dt-wrapper::-webkit-scrollbar-track {
+  background: var(--bg-table-header);
+}
+
+.dt-wrapper::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.dt-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+@media print {
+  .dt-container {
+    border: 1px solid var(--border-base);
+  }
+}
+
+

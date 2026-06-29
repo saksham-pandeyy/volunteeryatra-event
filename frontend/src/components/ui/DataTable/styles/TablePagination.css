@@ -1,0 +1,129 @@
+/* ===== TABLE PAGINATION ===== */
+.dt-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) 0;
+  gap: var(--space-4);
+}
+
+.dt-pagination__left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.dt-rows-per-page {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.dt-rows-per-page__label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.dt-pagination__info {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.dt-pagination__info--bold {
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.dt-pagination__right {
+  display: flex;
+  align-items: center;
+}
+
+.dt-pagination__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.dt-page-numbers {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-base);
+}
+
+.dt-nav-btn,
+.dt-page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast) var(--ease-out);
+}
+
+.dt-nav-btn {
+  border: 1px solid var(--border-base);
+  background: var(--bg-elevated);
+}
+
+.dt-nav-btn:hover:not(:disabled) {
+  background: var(--bg-surface);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.dt-page-btn:hover:not(.dt-page-btn--active) {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.dt-page-btn--active {
+  background: var(--primary);
+  color: white;
+}
+
+.dt-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.dt-page-ellipsis {
+  padding: 0 var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}
+
+@media (max-width: 768px) {
+  .dt-pagination {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .dt-pagination__left {
+    width: 100%;
+    justify-content: center;
+  }
+  .dt-page-numbers {
+    display: none;
+  }
+}
+
+@media print {
+  .dt-pagination {
+    display: none !important;
+  }
+}
+
+

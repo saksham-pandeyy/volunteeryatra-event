@@ -1,0 +1,137 @@
+/* ===== TABLE EMPTY STATE ===== */
+.dt-empty-state-wrapper {
+  padding: var(--space-20) var(--space-6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-base);
+  border-top: none;
+  border-bottom-left-radius: var(--radius-2xl);
+  border-bottom-right-radius: var(--radius-2xl);
+}
+
+.dt-empty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  gap: var(--space-6);
+}
+
+.dt-empty-illustration {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Search specific UI */
+.search-not-found-ui {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-pulse-ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: var(--primary-soft);
+  border-radius: 50%;
+  opacity: 0.15;
+  animation: pulse-ring 2.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+.search-icon-shield, 
+.empty-icon-shield {
+  width: 80px;
+  height: 80px;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-base);
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  z-index: 1;
+  transition: all var(--transition-normal);
+}
+
+.dt-empty--search .search-icon-shield {
+  border-color: var(--primary-soft);
+  color: var(--primary);
+}
+
+.search-x-icon {
+  filter: drop-shadow(0 4px 6px rgba(var(--primary-rgb), 0.15));
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.6); opacity: 0; }
+  50% { opacity: 0.2; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
+
+.dt-empty-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dt-empty-title {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.03em;
+}
+
+.dt-empty-description {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.6;
+  max-width: 460px;
+}
+
+.dt-empty-description strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.dt-empty-clear-btn {
+  height: 40px;
+  padding: 0 var(--space-6);
+  background: var(--primary-soft);
+  border: 1.5px solid var(--primary-soft);
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-top: var(--space-2);
+  margin-bottom: var(--space-6);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dt-empty-clear-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.dt-empty-clear-btn:active {
+  transform: translateY(0);
+}
+
+
