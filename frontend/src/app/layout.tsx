@@ -1,21 +1,22 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Poppins } from "next/font/google";
 import { Provider } from "react-redux";
 import { Toaster } from "sonner";
 import { store } from "@/store";
 import "@/styles/globals.css";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const poppins = Poppins({
+  weight: ["300", "400", "500", "600", "700", "800"],
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-plus-jakarta",
+  variable: "--font-poppins",
 });
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={plusJakartaSans.variable}>
+    <html lang="en" className={poppins.variable}>
       <body className="bg-background text-foreground antialiased font-sans">
         <Provider store={store}>
           {children}

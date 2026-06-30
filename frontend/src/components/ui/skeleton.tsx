@@ -73,20 +73,67 @@ export function SkeletonChart({ className }: SkeletonProps) {
   );
 }
 
+export function SkeletonPieChart({ className }: SkeletonProps) {
+  return (
+    <div className={clsx("flex flex-col items-center justify-center h-full py-6", className)}>
+      {/* Donut chart skeleton — only the ring animates, background stays clean */}
+      <div className="relative w-32 h-32 mb-5">
+        {/* Base ring with skeleton animation */}
+        <div className="absolute inset-0 rounded-full skeleton" />
+        {/* Inner hole — matches surface bg */}
+        <div className="absolute inset-[20px] rounded-full bg-surface" />
+        {/* Segment overlays with conic slices to simulate pie chart */}
+        <div
+          className="absolute rounded-full"
+          style={{
+            inset: 0,
+            background: 'conic-gradient(rgba(255,255,255,0.25) 0deg 130deg, transparent 130deg 360deg)',
+            mask: 'radial-gradient(circle at center, transparent 45%, black 45%)',
+            WebkitMask: 'radial-gradient(circle at center, transparent 45%, black 45%)',
+          }}
+        />
+        <div
+          className="absolute rounded-full"
+          style={{
+            inset: 0,
+            background: 'conic-gradient(rgba(255,255,255,0.15) 200deg 280deg, transparent 280deg 360deg)',
+            mask: 'radial-gradient(circle at center, transparent 45%, black 45%)',
+            WebkitMask: 'radial-gradient(circle at center, transparent 45%, black 45%)',
+          }}
+        />
+      </div>
+      {/* Legend skeleton — rows of dots + lines */}
+      <div className="flex items-center gap-5">
+        {[
+          { dotClass: "bg-surface-border", textClass: "w-14" },
+          { dotClass: "bg-surface-border", textClass: "w-16" },
+          { dotClass: "bg-surface-border", textClass: "w-12" },
+        ].map((item, i) => (
+          <div key={i} className="flex items-center gap-1.5">
+            <div className={clsx("w-2.5 h-2.5 rounded-full", item.dotClass)} />
+            <div className={clsx("skeleton h-3 rounded", item.textClass)} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function SkeletonAvatar({ className }: SkeletonProps) {
   return <SkeletonBase className={clsx("h-8 w-8 rounded-full", className)} />;
 }
 
 export function SkeletonStatCard({ className }: SkeletonProps) {
   return (
-    <div className={clsx("relative overflow-hidden rounded-xl border border-surface-border bg-surface p-5", className)}>
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-surface-hover" />
-      <div className="flex items-start justify-between mb-3">
-        <SkeletonText className="w-20" />
-        <SkeletonBase className="h-4 w-4 rounded-full" />
+    <div className={clsx("relative overflow-hidden border border-surface-border bg-surface p-5 flex flex-col justify-between min-h-[140px] shadow-sm rounded-xl", className)}>
+      <div className="flex items-center justify-between mb-3">
+        <SkeletonText className="w-24 h-3" />
+        <SkeletonBase className="w-8 h-8 rounded-xl shrink-0" />
       </div>
-      <SkeletonHeading className="w-24 mb-1" />
-      <SkeletonText className="w-32" />
+      <div className="flex flex-col gap-2">
+        <SkeletonText className="w-16 h-8" />
+        <SkeletonText className="w-32 h-3 mt-1" />
+      </div>
     </div>
   );
 }

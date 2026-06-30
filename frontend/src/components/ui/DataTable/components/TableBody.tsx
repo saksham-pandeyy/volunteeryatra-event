@@ -128,39 +128,17 @@ export const TableBody = ({
         </tr>
       ))}
       {tooltip && createPortal(
-        <div
-          className="fixed z-[999999] pointer-events-none"
+        <div className="dt-tooltip-portal"
           style={{
             top: tooltip.top,
             left: tooltip.left,
             transform: 'translate(-50%, -100%)',
-            filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.04))',
           }}
         >
           <div className="animate-fade-in">
-            <div
-              className="px-3 py-1.5 text-[11px] font-semibold rounded-md border border-[var(--border-strong)]"
-              style={{
-                backgroundColor: 'var(--bg-surface)',
-                color: 'var(--text-primary)',
-                whiteSpace: 'nowrap',
-                position: 'relative',
-              }}
-            >
+            <div className="dt-tooltip-content">
               {tooltip.text}
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: '-5px',
-                  left: '50%',
-                  transform: 'translateX(-50%) rotate(45deg)',
-                  width: '8px',
-                  height: '8px',
-                  backgroundColor: 'var(--bg-surface)',
-                  borderRight: '1px solid var(--border-strong)',
-                  borderBottom: '1px solid var(--border-strong)',
-                }}
-              />
+              <div className="dt-tooltip-arrow" />
             </div>
           </div>
         </div>,

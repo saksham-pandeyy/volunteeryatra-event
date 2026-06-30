@@ -15,6 +15,8 @@ interface ModalProps {
   onConfirm?: () => void;
   confirmVariant?: "primary" | "secondary" | "danger" | "ghost";
   confirmLoading?: boolean;
+  /** When true, disables the close (X) and Cancel buttons while confirmLoading is true */
+  disableActionsOnLoading?: boolean;
 }
 
 export function Modal({ 
@@ -28,7 +30,8 @@ export function Modal({
   cancelText,
   onConfirm,
   confirmVariant = "primary",
-  confirmLoading = false
+  confirmLoading = false,
+  disableActionsOnLoading = false
 }: ModalProps) {
   useEffect(() => {
     if (open) {
@@ -46,9 +49,9 @@ export function Modal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 transition-opacity duration-200"
-      onClick={onClose}
+      onClick={disableActionsOnLoading && confirmLoading ? undefined : onClose}
       onKeyDown={(e) => {
-        if (e.key === "Escape") onClose();
+        if (e.key === "Escape" && !(disableActionsOnLoading && confirmLoading)) onClose();
       }}
     >
       <div
@@ -59,8 +62,14 @@ export function Modal({
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          onClick={onClose}
-          className="absolute right-4 top-4 rounded-full p-1 text-muted hover:bg-surface-hover hover:text-foreground transition-colors cursor-pointer focus:outline-none"
+          onClick={disableActionsOnLoading && confirmLoading ? undefined : onClose}
+          disabled={disableActionsOnLoading && confirmLoading}
+          className={clsx(
+            "absolute right-4 top-4 rounded-full p-1 text-muted transition-colors focus:outline-none",
+            disableActionsOnLoading && confirmLoading
+              ? "opacity-30 cursor-not-allowed"
+              : "hover:bg-surface-hover hover:text-foreground cursor-pointer"
+          )}
           aria-label="Close modal"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -86,6 +95,7 @@ export function Modal({
               <Button
                 variant="secondary"
                 onClick={onClose}
+                disabled={disableActionsOnLoading && confirmLoading}
                 className="w-full"
               >
                 {cancelText || "Cancel"}

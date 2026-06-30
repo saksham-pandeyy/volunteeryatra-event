@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { notify } from "@/common/utils";
+import { uploadToStorage, STORAGE_BUCKETS } from "@/common/api/supabase";
 import { useUpdateProfileMutation, useUploadAvatarMutation, useRemoveAvatarMutation } from "@/features/auth/services";
 
 export type SettingsTab = "profile" | "theme";
@@ -36,33 +37,53 @@ export function useSettings() {
 
 export function useProfileForm(user: any) {
   const [name, setName] = useState(user?.name || "");
+  const [isEditing, setIsEditing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileMutation();
-  const [uploadAvatar, { isLoading: isUploading }] = useUploadAvatarMutation();
+  const [uploadAvatar, { isLoading: isUploadingMutation }] = useUploadAvatarMutation();
   const [removeAvatar] = useRemoveAvatarMutation();
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") || "http://localhost:4000";
-  const avatarSrc = user?.avatar_url ? `${apiUrl}${user.avatar_url}` : null;
+  useEffect(() => {
+    if (user?.name) {
+      setName(user.name);
+    }
+  }, [user]);
+
+  // avatar_url is now a full Supabase Storage URL, no prefix needed
+  const avatarSrc = user?.avatar_url || null;
 
   const handleSaveName = useCallback(async () => {
     if (!name.trim()) { notify.error("Name cannot be empty"); return; }
     try {
       await updateProfile({ name: name.trim() }).unwrap();
       notify.success("Name updated");
+      setIsEditing(false);
     } catch {
       notify.error("Failed to update name");
     }
   }, [name, updateProfile]);
 
+  const handleCancelEdit = useCallback(() => {
+    setName(user?.name || "");
+    setIsEditing(false);
+  }, [user]);
+
   const handleAvatarUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const formData = new FormData();
-    formData.append("avatar", file);
+    if (file.size > 5 * 1024 * 1024) {
+      notify.error("Image must be under 5MB");
+      return;
+    }
+    setIsUploading(true);
     try {
-      await uploadAvatar(formData).unwrap();
+      const publicUrl = await uploadToStorage(STORAGE_BUCKETS.avatars, file);
+      await uploadAvatar({ avatar_url: publicUrl }).unwrap();
       notify.success("Photo updated");
     } catch {
       notify.error("Failed to upload photo");
+    } finally {
+      setIsUploading(false);
     }
   }, [uploadAvatar]);
 
@@ -75,5 +96,17 @@ export function useProfileForm(user: any) {
     }
   }, [removeAvatar]);
 
-  return { name, setName, isUpdating, isUploading, avatarSrc, handleSaveName, handleAvatarUpload, handleRemoveAvatar };
+  return {
+    name,
+    setName,
+    isEditing,
+    setIsEditing,
+    handleCancelEdit,
+    isUpdating,
+    isUploading,
+    avatarSrc,
+    handleSaveName,
+    handleAvatarUpload,
+    handleRemoveAvatar,
+  };
 }

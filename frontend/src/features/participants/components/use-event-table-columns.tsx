@@ -1,34 +1,28 @@
 import { useMemo } from "react";
-import { createColumnHelper, Badge, Button } from "@/components/ui";
+import { createColumnHelper, Badge, Button, StatusDropdown } from "@/components/ui";
 import type { ColumnDef } from "@tanstack/react-table";
-import { formatDate, daysUntil } from "@/common/utils";
-import type { Event, EventStatus } from "@/common/types";
+import { formatDate } from "@/common/utils";
+import type { Event } from "@/common/types";
+import { Users, Eye, Pencil, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const eventHelper = createColumnHelper<Event>();
-
-const statusColors: Record<EventStatus, "default" | "warning" | "success"> = {
-  backlog: "default",
-  in_progress: "warning",
-  completed: "success",
-};
-
-const statusLabels: Record<EventStatus, string> = {
-  backlog: "Backlog",
-  in_progress: "In Progress",
-  completed: "Completed",
-};
 
 interface UseEventTableColumnsOptions {
   selectedEventId: string | null;
   onSelect: (id: string | null) => void;
   onOpen: (id: string) => void;
+  onDelete: (event: Event) => void;
 }
 
 export function useEventTableColumns({
   selectedEventId,
   onSelect,
   onOpen,
+  onDelete,
 }: UseEventTableColumnsOptions): ColumnDef<Event, unknown>[] {
+  const router = useRouter();
+
   return useMemo(
     () =>
       [
@@ -37,65 +31,82 @@ export function useEventTableColumns({
           header: "Date",
           size: 140,
           cell: (info: any) => (
-            <div>
-              <p className="text-sm">{formatDate(info.getValue())}</p>
-              <p className="text-xs text-muted mt-0.5">
-                {daysUntil(info.getValue())}
-              </p>
-            </div>
+            <span className="text-sm text-[var(--color-base-600)]">{formatDate(info.getValue())}</span>
           ),
+        }),
+        eventHelper.accessor("location", {
+          header: "Location",
+          size: 140,
+          cell: (info: any) => (
+            <span className="text-sm text-[var(--color-base-500)] truncate block">{info.getValue() || "—"}</span>
+          ),
+        }),
+        eventHelper.accessor("category", {
+          header: "Category",
+          size: 120,
+          cell: (info: any) => {
+            const cat = info.getValue() as string;
+            return <span className="text-sm text-[var(--color-base-600)] capitalize">{cat || "other"}</span>;
+          },
         }),
         eventHelper.accessor("status", {
           header: "Status",
           size: 130,
-          cell: (info: any) => {
-            const val = info.getValue() as EventStatus;
-            return (
-              <Badge variant={statusColors[val] || "default"}>
-                {statusLabels[val] || val}
-              </Badge>
-            );
-          },
+          cell: (info: any) => <StatusDropdown value={info.getValue()} eventId={info.row.original.id} />,
         }),
         eventHelper.accessor("participant_count", {
-          header: "Participants",
-          size: 100,
+          header: "Capacity",
+          size: 110,
           cell: (info: any) => (
-            <span className="text-sm font-medium">
-              {info.getValue() ?? 0}
-            </span>
+            <div className="flex items-center gap-1.5">
+              <Users size={13} className="text-[var(--color-base-400)]" />
+              <span className="text-sm font-medium">{info.getValue() ?? 0}</span>
+              {info.row.original.max_participants && (
+                <span className="text-xs text-[var(--color-base-400)]">/ {info.row.original.max_participants}</span>
+              )}
+            </div>
           ),
         }),
         eventHelper.display({
-          id: "view",
+          id: "actions",
           header: "",
-          size: 100,
+          size: 120,
           cell: (info: any) => (
-            <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => onOpen(info.row.original.id)}
+            <div className="flex items-center justify-center gap-1.5">
+              <button
+                className="dt-action-btn dt-action-view"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpen(info.row.original.id);
+                }}
+                title="View event details"
               >
-                Open
-              </Button>
-              <Button
-                size="sm"
-                variant={
-                  selectedEventId === info.row.original.id
-                    ? "primary"
-                    : "secondary"
-                }
-                onClick={() => onSelect(info.row.original.id)}
+                <Eye size={16} strokeWidth={2} />
+              </button>
+              <button
+                className="dt-action-btn dt-action-edit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/events/${info.row.original.id}/edit`);
+                }}
+                title="Edit event"
               >
-                {selectedEventId === info.row.original.id
-                  ? "Selected"
-                  : "View"}
-              </Button>
+                <Pencil size={16} strokeWidth={2} />
+              </button>
+              <button
+                className="dt-action-btn dt-action-delete"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(info.row.original);
+                }}
+                title="Delete event"
+              >
+                <Trash2 size={16} strokeWidth={2} />
+              </button>
             </div>
           ),
         }),
       ] as ColumnDef<Event, unknown>[],
-    [selectedEventId, onSelect, onOpen]
+    [selectedEventId, onSelect, onOpen, onDelete, router]
   );
 }

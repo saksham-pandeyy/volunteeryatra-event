@@ -25,6 +25,7 @@ export const createEventSchema = z.object({
   start_time: z.string().optional(),
   end_time: z.string().optional(),
   cover_image_url: z.string().optional(),
+  status: z.string().optional(),
 });
 
 export const updateEventSchema = createEventSchema.partial();

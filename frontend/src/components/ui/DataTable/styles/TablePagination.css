@@ -10,7 +10,7 @@
 .dt-pagination__left {
   display: flex;
   align-items: center;
-  gap: var(--space-6);
+  gap: 24px;
 }
 
 .dt-rows-per-page {
@@ -24,6 +24,46 @@
   font-weight: var(--font-bold);
   color: var(--text-muted);
   text-transform: uppercase;
+}
+
+.dt-rows-select-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.dt-rows-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 4px 28px 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-foreground);
+  background: var(--color-surface);
+  border: 1px solid var(--color-surface-border);
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  min-width: 60px;
+}
+
+.dt-rows-select:hover {
+  border-color: var(--color-primary);
+}
+
+.dt-rows-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 20%, transparent);
+}
+
+.dt-rows-select-chevron {
+  position: absolute;
+  right: 8px;
+  pointer-events: none;
+  color: var(--color-muted);
+  flex-shrink: 0;
 }
 
 .dt-pagination__info {
@@ -50,11 +90,7 @@
 .dt-page-numbers {
   display: flex;
   align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-1);
   background: var(--bg-elevated);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-base);
 }
 
 .dt-nav-btn,
@@ -65,34 +101,27 @@
   min-width: 32px;
   height: 32px;
   border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-secondary);
+  border: 1px solid var(--color-surface-border);
+  background: var(--color-surface);
+  color: var(--color-muted);
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   cursor: pointer;
   transition: all var(--transition-fast) var(--ease-out);
+  margin-inline: 6px;
 }
 
-.dt-nav-btn {
-  border: 1px solid var(--border-base);
-  background: var(--bg-elevated);
-}
-
-.dt-nav-btn:hover:not(:disabled) {
-  background: var(--bg-surface);
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
+.dt-nav-btn:hover:not(:disabled),
 .dt-page-btn:hover:not(.dt-page-btn--active) {
-  background: var(--bg-surface);
-  color: var(--text-primary);
+  border-color: var(--color-primary);
+  color: var(--color-foreground);
+  background: var(--color-surface-hover);
 }
 
 .dt-page-btn--active {
-  background: var(--primary);
-  color: white;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-surface-border));
 }
 
 .dt-nav-btn:disabled {
@@ -111,10 +140,12 @@
     flex-direction: column;
     gap: var(--space-4);
   }
+
   .dt-pagination__left {
     width: 100%;
     justify-content: center;
   }
+
   .dt-page-numbers {
     display: none;
   }
@@ -125,5 +156,3 @@
     display: none !important;
   }
 }
-
-

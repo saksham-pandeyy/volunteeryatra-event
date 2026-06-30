@@ -49,6 +49,7 @@ interface DataTableProps {
   isFiltered?: boolean;
   onClearFilters?: () => void;
   rowClassName?: string;
+  maxHeight?: string | number;
   
   // Legacy / Compatibility props
   filterColumn?: string;
@@ -83,6 +84,7 @@ const DataTable = memo(function DataTable({
   isFiltered: userIsFiltered,
   onClearFilters,
   rowClassName,
+  maxHeight,
 
   filterColumn,
   filterPlaceholder = "Search...",
@@ -263,7 +265,7 @@ const DataTable = memo(function DataTable({
             )}
           </div>
         ) : (
-          <div className="dt-wrapper">
+          <div className="dt-wrapper" style={maxHeight ? { maxHeight: typeof maxHeight === 'number' ? maxHeight + 'px' : maxHeight } : undefined}>
             <table className="dt-table">
               {renderTableHead()}
               <TableBody

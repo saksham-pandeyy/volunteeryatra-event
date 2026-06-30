@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { RefreshCw, FileDown, Search } from "lucide-react";
 import { ColumnVisibilityDropdown } from "./ColumnVisibilityDropdown";
 
@@ -27,18 +28,65 @@ export function TableToolbar({
   loading = false,
   filters,
 }: TableToolbarProps) {
+  const [localSearch, setLocalSearch] = useState(search);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sync external search prop if it changes
+  useEffect(() => {
+    setLocalSearch(search);
+  }, [search]);
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setLocalSearch(val);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      onSearchChange?.(val);
+    }, 300);
+  }, [onSearchChange]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
+
   const handleExportCSV = () => {
     const rows = table.getFilteredRowModel().rows;
     const data = rows.map((r: any) => r.original);
     if (data.length === 0) return;
 
-    const visibleCols = table.getVisibleLeafColumns().filter((c: any) => c.id !== "actions");
-    const headers = visibleCols.map((c: any) => c.columnDef.header || c.id).join(",");
-    
+    // Include ALL relevant data columns from the raw data (not just visible table columns)
+    const csvFields = [
+      { key: "name", label: "Name" },
+      { key: "description", label: "Description" },
+      { key: "date", label: "Date" },
+      { key: "location", label: "Location" },
+      { key: "category", label: "Category" },
+      { key: "status", label: "Status" },
+      { key: "max_participants", label: "Max Participants" },
+      { key: "registration_deadline", label: "Registration Deadline" },
+      { key: "start_time", label: "Start Time" },
+      { key: "end_time", label: "End Time" },
+      { key: "created_at", label: "Created At" },
+      { key: "updated_at", label: "Updated At" },
+    ];
+
+    const headers = csvFields.map((f) => f.label).join(",");
+
     const csvRows = data.map((row: any) =>
-      visibleCols
-        .map((col: any) => {
-          const val = row[col.id];
+      csvFields
+        .map((f) => {
+          let val = row[f.key];
+          if (val === null || val === undefined) val = "";
+          // Format date fields
+          if ((f.key === "date" || f.key === "registration_deadline" || f.key === "created_at" || f.key === "updated_at") && val) {
+            try {
+              val = new Date(val).toLocaleDateString("en-US", {
+                month: "short", day: "numeric", year: "numeric",
+              });
+            } catch {}
+          }
           return typeof val === "string" ? `"${val.replace(/"/g, '""')}"` : val;
         })
         .join(",")
@@ -66,8 +114,9 @@ export function TableToolbar({
               type="text"
               className="form-input block w-full rounded-lg border border-surface-border bg-surface pl-10 pr-3 py-2 text-sm text-foreground placeholder-muted focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               placeholder={searchPlaceholder}
-              value={search}
-              onChange={(e) => onSearchChange(e.target.value)}
+              value={localSearch}
+              onChange={handleChange}
+              style={{ paddingLeft: "2.5rem" }}
             />
           </div>
         )}
@@ -77,13 +126,12 @@ export function TableToolbar({
         {filters && <div className="toolbar-filters">{filters}</div>}
 
         <div className="toolbar-actions">
-          <ColumnVisibilityDropdown table={table} columns={columns} />
-
           <button
             type="button"
-            className="toolbar-btn toolbar-btn--pdf"
+            className="toolbar-btn toolbar-btn--download"
             onClick={handleExportCSV}
             title="Download CSV"
+            style={{ marginLeft: "8px" }}
           >
             <FileDown size={18} strokeWidth={1.8} />
           </button>

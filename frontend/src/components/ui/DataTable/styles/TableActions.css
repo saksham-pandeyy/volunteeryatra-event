@@ -9,18 +9,18 @@
 }
 
 .dt-action-btn {
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-base);
+  border-radius: 8px;
+  border: 1px solid var(--color-surface-border);
   cursor: pointer;
-  transition: all var(--transition-fast) var(--ease-out);
+  transition: all 0.15s ease;
   flex-shrink: 0;
-  background: var(--bg-surface);
-  color: var(--text-secondary);
+  background: var(--color-surface);
+  color: var(--color-muted);
   position: relative;
   overflow: hidden;
 }
@@ -47,33 +47,31 @@
 }
 
 .dt-action-btn:hover {
-  transform: none;
-  box-shadow: none;
-  border-color: var(--primary);
+  transform: translateY(-1px);
 }
 
 .dt-action-view {
-  background: color-mix(in srgb, var(--info) 8%, var(--bg-surface));
-  color: var(--info);
-  border-color: color-mix(in srgb, var(--info) 20%, var(--border-base));
+  background: rgba(59, 130, 246, 0.08);
+  color: var(--color-accent-blue);
+  border-color: rgba(59, 130, 246, 0.2);
 }
 
 .dt-action-view:hover {
-  background: var(--info);
+  background: var(--color-accent-blue);
   color: white;
-  border-color: var(--info);
+  border-color: var(--color-accent-blue);
 }
 
 .dt-action-edit {
-  background: color-mix(in srgb, var(--primary) 8%, var(--bg-surface));
-  color: var(--primary);
-  border-color: color-mix(in srgb, var(--primary) 20%, var(--border-base));
+  background: rgba(99, 102, 241, 0.08);
+  color: rgb(99, 102, 241);
+  border-color: rgba(99, 102, 241, 0.2);
 }
 
 .dt-action-edit:hover {
-  background: var(--primary);
+  background: rgb(99, 102, 241);
   color: white;
-  border-color: var(--primary);
+  border-color: rgb(99, 102, 241);
 }
 
 .dt-action-success {
@@ -126,16 +124,16 @@
 
 .dt-action-danger,
 .dt-action-delete {
-  background: color-mix(in srgb, var(--error) 8%, var(--bg-surface));
-  color: var(--error);
-  border-color: color-mix(in srgb, var(--error) 20%, var(--border-base));
+  background: rgba(244, 63, 94, 0.07);
+  color: var(--color-danger);
+  border-color: rgba(244, 63, 94, 0.25);
 }
 
 .dt-action-danger:hover,
 .dt-action-delete:hover {
-  background: var(--error);
+  background: var(--color-danger);
   color: white;
-  border-color: var(--error);
+  border-color: var(--color-danger);
 }
 
 .dt-action-primary {

@@ -26,10 +26,15 @@ export function useAuth() {
     setInitialized(true);
   }, []);
 
-  // Fetch /me ONLY on page refresh when token exists but user is null
-  const { data: meData, isError: meError } = useGetMeQuery(undefined, {
-    skip: !token || !!user || !initialized,
+  // Fetch /me when token exists — stays active so RTK Query refetches on tag invalidation
+  const { data: meData, isError: meError, refetch: refetchUser } = useGetMeQuery(undefined, {
+    skip: !token || !initialized,
   });
+
+  // Expose refetchUser so consumers (e.g. settings) can trigger a user refresh
+  const refreshUser = useCallback(() => {
+    if (token) refetchUser();
+  }, [token, refetchUser]);
 
   useEffect(() => {
     if (meData) {
@@ -75,5 +80,5 @@ export function useAuth() {
     notify.info("You have been logged out");
   }, []);
 
-  return { user, isAuthenticated: !!token, login, register, logout, loginLoading, registerLoading, initialized };
+  return { user, isAuthenticated: !!token, login, register, logout, refreshUser, loginLoading, registerLoading, initialized };
 }

@@ -44,6 +44,7 @@ export interface CreateEventPayload {
   start_time?: string;
   end_time?: string;
   cover_image_url?: string;
+  status?: EventStatus;
 }
 
 export interface UpdateEventPayload extends Partial<CreateEventPayload> {}
@@ -54,11 +55,26 @@ export interface EventFilters {
   location?: string;
   status?: EventStatus;
   sortAsc?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginationInfo {
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  pagination: PaginationInfo;
 }
 
 export interface ListEventsResponse {
   success: boolean;
   data: Event[];
+  pagination?: PaginationInfo;
 }
 
 export interface DashboardStats {
@@ -68,7 +84,8 @@ export interface DashboardStats {
   pendingParticipants: number;
   avgPerEvent: number;
   byStatus: { backlog: number; in_progress: number; completed: number };
-  monthlyTrend: Array<{ label: string; count: number }>;
-  eventStatusTrend: Array<{ label: string; backlog: number; in_progress: number; completed: number }>;
+  trend: Array<{ label: string; count: number }>;
+  trendInterval: "daily" | "monthly" | "yearly";
+  eventStatusTrend?: Array<{ label: string; backlog: number; in_progress: number; completed: number }>;
   dateRangeLabel: string;
 }

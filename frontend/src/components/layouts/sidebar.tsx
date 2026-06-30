@@ -23,8 +23,8 @@ export function Sidebar({ user, onLogoutClick }: SidebarProps) {
     href === "/settings" ? pathname.startsWith("/settings") :
     pathname.startsWith(href);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.replace("/api", "") || "http://localhost:4000";
-  const avatarSrc = user?.avatar_url ? `${apiUrl}${user.avatar_url}` : null;
+  // avatar_url is now a full Supabase Storage URL, no prefix needed
+  const avatarSrc = user?.avatar_url || null;
 
   return (
     <aside

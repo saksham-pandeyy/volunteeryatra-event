@@ -3,7 +3,7 @@ export type ParticipantStatus = "applied" | "approved" | "cancelled";
 export interface Participant {
   id: string;
   event_id: string;
-  user_id: string;
+  user_id: string | null;
   name: string;
   email: string;
   status: ParticipantStatus;

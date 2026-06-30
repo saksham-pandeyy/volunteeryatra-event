@@ -1,8 +1,9 @@
 import clsx from "clsx";
+import type { ReactNode } from "react";
 
 interface BadgeProps {
   variant?: "default" | "success" | "danger" | "warning";
-  children: string;
+  children: ReactNode;
   className?: string;
 }
 

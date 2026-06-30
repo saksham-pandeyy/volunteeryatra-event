@@ -6,8 +6,6 @@ export const routes = {
     forgotPassword: "/auth/forgot-password",
     resetPassword: "/auth/reset-password",
     updateProfile: "/auth/profile",
-    uploadAvatar: "/auth/avatar",
-    removeAvatar: "/auth/avatar",
   },
   events: {
     list: "/events",
@@ -25,6 +23,7 @@ export const routes = {
   participants: {
     apply: (eventId: string) => `/events/${eventId}/apply`,
     list: (eventId: string) => `/events/${eventId}/participants`,
+    add: (eventId: string) => `/events/${eventId}/participants/add`,
     cancel: (eventId: string, participantId: string) =>
       `/events/${eventId}/participants/${participantId}`,
   },

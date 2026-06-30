@@ -26,6 +26,15 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
   }, [pathname]);
 
   useEffect(() => {
+    const stored = localStorage.getItem("theme");
+    if (stored === "dark") {
+      document.documentElement.classList.add("dark-theme");
+    } else {
+      document.documentElement.classList.remove("dark-theme");
+    }
+  }, []);
+
+  useEffect(() => {
     const handleStart = () => setNavigating(true);
     const handleEnd = () => setNavigating(false);
     window.addEventListener("beforeunload", handleStart);
@@ -52,8 +61,9 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
 
       <div className="flex flex-1 flex-col h-full overflow-hidden bg-background">
         <header 
+          className="transition-all duration-300"
           style={{
-            height: "64px",
+            height: "72px",
             borderBottom: "1px solid var(--color-surface-border)",
             backgroundColor: "var(--color-surface)",
             display: "flex",
@@ -65,23 +75,27 @@ export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
             flexShrink: 0,
           }}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {backHref && (
               <button
                 onClick={() => router.push(backHref)}
-                className="flex items-center justify-center h-8 w-8 rounded-lg text-muted hover:text-foreground hover:bg-surface-hover transition-all cursor-pointer"
-                style={{ background: "none", border: "none", padding: 0 }}
+                className="flex items-center justify-center h-9 w-9 rounded-lg text-muted hover:text-foreground hover:bg-surface-hover hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer shadow-sm"
+                style={{
+                  border: "1px solid var(--color-surface-border)",
+                  backgroundColor: "var(--color-background)",
+                  padding: 0
+                }}
                 aria-label="Go back"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M19 12H5" />
                   <path d="M12 19l-7-7 7-7" />
                 </svg>
               </button>
             )}
             <div>
-              <h1 className="text-lg font-bold text-foreground tracking-tight">{title || getPageTitle()}</h1>
-              {subtitle && <p className="text-xs text-muted mt-0.5 leading-none">{subtitle}</p>}
+              <h1 className="text-xl md:text-2xl font-semibold text-foreground tracking-tight leading-none">{title || getPageTitle()}</h1>
+              {subtitle && <p className="text-xs md:text-sm text-muted mt-1 leading-none font-medium">{subtitle}</p>}
             </div>
           </div>
           {headerExtra && <div className="flex items-center gap-4">{headerExtra}</div>}

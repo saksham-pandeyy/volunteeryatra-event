@@ -1,15 +1,18 @@
 "use client";
 
-import { BentoGrid, BentoCard, StatsCard, StatsGrid, SkeletonStatCard, SkeletonChart } from "@/components/ui";
-import { MonthlyBarChart, ParticipantPieChart, ChartLegend } from "@/components/ui";
+import { BentoGrid, BentoCard, StatsCard, StatsGrid, SkeletonStatCard, SkeletonChart, SkeletonPieChart } from "@/components/ui";
+import { TrendChart, ParticipantPieChart, ChartLegend } from "@/components/ui";
+import type { ChartType } from "@/components/ui/charts";
 import type { DashboardStats } from "@/common/types";
-import { Calendar, Users, TrendingUp, BarChart3, Activity, Inbox } from "lucide-react";
+import { Calendar, Users, TrendingUp, BarChart3, Activity, Inbox, BarChart, LineChart } from "lucide-react";
 
 interface StatsSectionProps {
   stats: DashboardStats | null;
   dateRangeLabel: string;
   trend: { direction: "up" | "down" | "neutral"; value: string } | null;
   isLoading: boolean;
+  chartType: ChartType;
+  onChartTypeChange: (type: ChartType) => void;
 }
 
 function ChartEmptyState({ message, description }: { message: string; description?: string }) {
@@ -26,7 +29,7 @@ function ChartEmptyState({ message, description }: { message: string; descriptio
   );
 }
 
-export function DashboardStatsSection({ stats, dateRangeLabel, trend, isLoading }: StatsSectionProps) {
+export function DashboardStatsSection({ stats, dateRangeLabel, trend, isLoading, chartType, onChartTypeChange }: StatsSectionProps) {
   if (isLoading || !stats) {
     return (
       <div className="space-y-6">
@@ -37,7 +40,7 @@ export function DashboardStatsSection({ stats, dateRangeLabel, trend, isLoading 
         </StatsGrid>
         <BentoGrid>
           <BentoCard span={3} title="Monthly Trend"><SkeletonChart /></BentoCard>
-          <BentoCard span={3} title="Event Status"><SkeletonChart /></BentoCard>
+          <BentoCard span={3} title="Event Status"><SkeletonPieChart /></BentoCard>
         </BentoGrid>
       </div>
     );
@@ -51,7 +54,7 @@ export function DashboardStatsSection({ stats, dateRangeLabel, trend, isLoading 
   const inProgress = stats.byStatus.in_progress;
   const completed = stats.byStatus.completed;
   const hasEventData = stats.totalEvents > 0;
-  const hasMonthlyData = stats.monthlyTrend.some((m) => m.count > 0);
+  const hasMonthlyData = stats.trend.some((m) => m.count > 0);
   const hasStatusData = backlogs > 0 || inProgress > 0 || completed > 0;
 
   // Build trend label dynamically from the date range
@@ -65,26 +68,25 @@ export function DashboardStatsSection({ stats, dateRangeLabel, trend, isLoading 
         <StatsCard
           title="Total Events"
           value={hasEventData ? stats.totalEvents : 0}
-          description={dateRangeLabel}
           trend={trend && hasEventData ? { direction: trend.direction, value: trendLabel } : undefined}
           isPositive={trend ? trend.direction === "up" : true}
           icon={Calendar}
         />
-        <StatsCard 
-          title="Upcoming Events" 
-          value={hasEventData ? stats.totalUpcoming : 0} 
+        <StatsCard
+          title="Upcoming Events"
+          value={hasEventData ? stats.totalUpcoming : 0}
           description={dateRangeLabel}
           icon={Activity}
         />
-        <StatsCard 
-          title="Total Participants" 
-          value={stats.totalParticipants} 
+        <StatsCard
+          title="Total Participants"
+          value={stats.totalParticipants}
           description={`${stats.pendingParticipants} pending approval`}
           icon={Users}
         />
-        <StatsCard 
-          title="Completion Rate" 
-          value={hasEventData ? `${completionRate}%` : "—"} 
+        <StatsCard
+          title="Completion Rate"
+          value={hasEventData ? `${completionRate}%` : "—"}
           description={hasEventData ? `${completed} of ${stats.totalEvents} events done` : "No events in range"}
           icon={BarChart3}
           isPositive={completionRate >= 50}
@@ -93,20 +95,49 @@ export function DashboardStatsSection({ stats, dateRangeLabel, trend, isLoading 
       </StatsGrid>
 
       <BentoGrid>
-        <BentoCard span={3} title="Monthly Trend" subtitle={dateRangeLabel} icon={TrendingUp}>
+        <BentoCard span={3} title="Event Trend" icon={TrendingUp}
+          action={
+            <div className="flex items-center bg-surface-hover/50 rounded-lg p-0.5 border border-surface-border">
+              <button
+                type="button"
+                onClick={() => onChartTypeChange("bar")}
+                className={`flex items-center justify-center w-7 h-7 rounded-md transition-all duration-150 ${
+                  chartType === "bar"
+                    ? "bg-surface shadow-sm text-foreground"
+                    : "text-muted hover:text-foreground"
+                }`}
+                title="Bar chart"
+              >
+                <BarChart size={14} strokeWidth={2} />
+              </button>
+              <button
+                type="button"
+                onClick={() => onChartTypeChange("line")}
+                className={`flex items-center justify-center w-7 h-7 rounded-md transition-all duration-150 ${
+                  chartType === "line"
+                    ? "bg-surface shadow-sm text-foreground"
+                    : "text-muted hover:text-foreground"
+                }`}
+                title="Line chart"
+              >
+                <LineChart size={14} strokeWidth={2} />
+              </button>
+            </div>
+          }
+        >
           <div className="h-52">
             {hasMonthlyData ? (
-              <MonthlyBarChart data={stats.monthlyTrend} />
+              <TrendChart data={stats.trend} chartType={chartType} interval={stats.trendInterval} />
             ) : (
               <ChartEmptyState
                 message="No event data yet"
-                description="Create events to see monthly distribution"
+                description="Create events to see distribution over time"
               />
             )}
           </div>
         </BentoCard>
 
-        <BentoCard span={3} title="Event Status" subtitle={dateRangeLabel} icon={Activity}>
+        <BentoCard span={3} title="Event Status" icon={Activity}>
           {hasStatusData ? (
             <div className="flex flex-col items-center justify-center h-52">
               <div className="h-40 w-full">

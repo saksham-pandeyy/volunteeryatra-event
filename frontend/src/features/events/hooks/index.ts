@@ -5,5 +5,4 @@ export { useUpdateEvent } from "./use-update-event";
 export { useDashboardStats } from "./use-dashboard-stats";
 export { useCoverUpload } from "./use-cover-upload";
 export { useGeocode } from "./use-geocode";
-export { useRealtimeStats } from "./use-realtime-stats";
-export { useDeleteEvent } from "./use-delete-event";
+export { useApplyToEvent } from "./use-apply-to-event";

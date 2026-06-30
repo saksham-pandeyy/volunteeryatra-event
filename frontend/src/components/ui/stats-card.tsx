@@ -40,7 +40,7 @@ export const StatsCard = memo(function StatsCard({
 
   const cardTitle = title || label || "";
   const cardDescription = description || subtext || "";
-  
+
   let cardTrend: string | undefined = undefined;
   let cardPositive = isPositive;
 
@@ -54,9 +54,9 @@ export const StatsCard = memo(function StatsCard({
   }
 
   return (
-    <Card className="relative overflow-hidden border border-surface-border bg-surface p-5 transition-all hover:border-primary/30 flex flex-col justify-between min-h-[140px] shadow-sm hover:shadow-md">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-[11px] font-black uppercase tracking-[0.15em] text-muted">
+    <Card className="relative overflow-hidden border border-surface-border bg-surface p-5 transition-all hover:border-primary/30 flex flex-col justify-between min-h-[130px] shadow-sm hover:shadow-md">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-muted">
           {cardTitle}
         </span>
         {Icon && (
@@ -68,21 +68,22 @@ export const StatsCard = memo(function StatsCard({
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <h3 className="text-3xl font-black leading-none tracking-tight text-foreground">
+      <div className="mt-2 space-y-1">
+        <h3 className="text-2xl font-bold tracking-tight text-foreground">
           {value}
         </h3>
 
         {(cardTrend || cardDescription) && (
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center flex-wrap gap-1.5 text-xs text-muted">
             {cardTrend && (
-              <div className={`flex items-center gap-1 font-bold text-[10px] uppercase tracking-wider ${cardPositive ? "text-success" : "text-danger"}`}>
-                {cardPositive ? <TrendingUp size={12} strokeWidth={2.5} /> : <TrendingDown size={12} strokeWidth={2.5} />}
+              <span className={`inline-flex items-center gap-1 font-semibold ${cardPositive ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+                {cardPositive ? <TrendingUp size={13} /> : <TrendingDown size={13} />}
                 {cardTrend}
-              </div>
+              </span>
             )}
+            {cardTrend && cardDescription && <span className="text-base-300">•</span>}
             {cardDescription && (
-              <span className="text-[10px] text-muted font-medium">{cardDescription}</span>
+              <span className="font-normal text-muted">{cardDescription}</span>
             )}
           </div>
         )}
@@ -93,14 +94,16 @@ export const StatsCard = memo(function StatsCard({
 
 export function StatsCardSkeleton() {
   return (
-    <div className="flex flex-col justify-between min-h-[140px] p-5 rounded-xl border border-surface-border bg-surface shadow-sm animate-pulse">
-      <div className="flex items-center justify-between mb-4">
-        <SkeletonText className="w-[55%] h-3" />
-        <SkeletonText className="w-8 h-8 rounded-xl" />
+    <Card className="relative overflow-hidden border border-surface-border bg-surface p-5 flex flex-col justify-between min-h-[140px] shadow-sm">
+      <div className="flex items-center justify-between mb-3">
+        <SkeletonText className="w-16 h-3" />
+        <div className="w-8 h-8 rounded-xl skeleton shrink-0" />
       </div>
-      <SkeletonText className="w-[35%] h-7 mb-4" />
-      <SkeletonText className="w-[50%] h-2.5" />
-    </div>
+      <div className="flex flex-col gap-2">
+        <SkeletonText className="w-16 h-8" />
+        <SkeletonText className="w-32 h-3 mt-1" />
+      </div>
+    </Card>
   );
 }
 

@@ -73,7 +73,7 @@ export function LocationSearch({
       setLoading(true);
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`,
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1&countrycodes=in`,
           { headers: { "Accept-Language": "en" } }
         );
         if (!res.ok) throw new Error("Failed to fetch");
@@ -161,7 +161,7 @@ export function LocationSearch({
           }}
           placeholder={placeholder}
           autoComplete="off"
-          className={`form-input w-full pl-10 pr-10 ${
+          className={`form-input w-full !pl-10 !pr-10 ${
             error ? "border-danger focus:border-danger focus:ring-danger-muted" : ""
           }`}
           style={{ borderRadius: "8px" }}

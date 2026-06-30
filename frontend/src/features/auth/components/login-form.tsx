@@ -73,7 +73,7 @@ function LoginFormContent() {
           placeholder="Enter your password" 
         />
 
-        <div className="flex items-center justify-between text-sm mt-5 mb-5">
+        <div className="flex items-center text-sm mt-5 mb-5">
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
@@ -81,9 +81,6 @@ function LoginFormContent() {
             />
             <span className="text-muted font-medium">Keep me signed in</span>
           </label>
-          <Link href="/forgot-password" className="text-primary hover:underline font-semibold">
-            Forgot Password?
-          </Link>
         </div>
 
         <Button type="submit" loading={loginLoading} className="w-full mt-2">

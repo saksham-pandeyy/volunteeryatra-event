@@ -1,6 +1,11 @@
+import { useEffect } from "react";
 import type { ReactNode } from "react";
 
 export function GuestLayout({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    document.documentElement.classList.remove("dark-theme");
+  }, []);
+
   return (
     <div className="guest-theme min-h-screen flex flex-col md:flex-row bg-background text-foreground">
       <div className="relative hidden md:flex md:w-1/2 min-h-screen flex-col justify-center items-center p-12 text-center text-white">

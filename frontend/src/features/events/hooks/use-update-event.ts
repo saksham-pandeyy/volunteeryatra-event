@@ -22,6 +22,7 @@ export function useUpdateEvent(eventId: string) {
         date: event.date,
         location: event.location || "",
         category: event.category || "other",
+        status: event.status,
         max_participants: event.max_participants ?? undefined,
         start_time: event.start_time ?? undefined,
         end_time: event.end_time ?? undefined,

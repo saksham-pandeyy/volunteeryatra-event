@@ -1,12 +1,15 @@
 import { baseApi, routes, transformResponse } from "@/common/api";
-import type { Event, EventStatus, CreateEventPayload, UpdateEventPayload, EventFilters, DashboardStats } from "@/common/types";
+import type { Event, EventStatus, CreateEventPayload, UpdateEventPayload, EventFilters, DashboardStats, PaginatedResult } from "@/common/types";
 import type { ApiResponse } from "@/common/types";
 
 const eventsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    listEvents: builder.query<Event[], EventFilters>({
+    listEvents: builder.query<PaginatedResult<Event>, EventFilters>({
       query: (params) => ({ url: routes.events.list, params }),
-      transformResponse: (res: ApiResponse<Event[]>) => res.data,
+      transformResponse: (res: ApiResponse<Event[]> & { pagination: { total: number; page: number; limit: number; pages: number } }) => ({
+        data: res.data,
+        pagination: res.pagination || { total: 0, page: 1, limit: 10, pages: 0 },
+      }),
       providesTags: ["Events"],
     }),
     getEvent: builder.query<Event, string>({

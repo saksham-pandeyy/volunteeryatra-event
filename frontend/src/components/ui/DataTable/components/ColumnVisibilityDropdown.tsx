@@ -38,9 +38,9 @@ export function ColumnVisibilityDropdown({ table, columns }: ColumnVisibilityDro
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-1 z-[100] min-w-[200px] rounded-xl border border-[var(--border-base)] bg-[var(--bg-surface)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="px-3 pb-1.5 mb-1 border-b border-[var(--border-base)]">
-            <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+        <div className="absolute right-0 top-full mt-2 z-[100] min-w-[200px] rounded-xl border border-surface-border bg-surface shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="px-3 pb-1.5 mb-1 border-b border-surface-border">
+            <span className="text-[9px] font-bold uppercase tracking-wider text-muted">
               Toggle Columns
             </span>
           </div>
@@ -54,15 +54,15 @@ export function ColumnVisibilityDropdown({ table, columns }: ColumnVisibilityDro
             return (
               <label
                 key={col.key}
-                className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-[var(--bg-subtle)] cursor-pointer transition-colors"
+                className="flex items-center gap-2.5 px-3 py-1.5 hover:bg-surface-hover cursor-pointer transition-colors"
               >
                 <input
                   type="checkbox"
                   checked={isVisible}
                   onChange={() => tableCol?.toggleVisibility()}
-                  className="w-3.5 h-3.5 rounded border-[var(--border-strong)] text-[var(--primary)] focus:ring-[var(--primary)]/30"
+                  className="w-3.5 h-3.5 rounded border-surface-border text-primary focus:ring-primary-ring"
                 />
-                <span className="text-xs font-medium text-[var(--text-secondary)] select-none">
+                <span className="text-xs font-medium text-foreground select-none">
                   {col.label || col.header || col.key}
                 </span>
               </label>

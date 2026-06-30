@@ -37,16 +37,21 @@ export const TablePagination = ({
       <div className="dt-pagination__left">
         <div className="dt-rows-per-page">
           <span className="dt-rows-per-page__label">Rows:</span>
-          <select
-            value={pagination.limit}
-            onChange={(e) => handleRowsChange(Number(e.target.value))}
-            className="rounded border border-surface-border bg-surface px-2 py-1 text-xs text-foreground focus:border-primary focus:outline-none"
-          >
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </select>
+          <div className="dt-rows-select-wrapper">
+            <select
+              value={pagination.limit}
+              onChange={(e) => handleRowsChange(Number(e.target.value))}
+              className="dt-rows-select"
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <svg className="dt-rows-select-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </div>
         </div>
         <div className="dt-pagination__info">
           Showing{" "}

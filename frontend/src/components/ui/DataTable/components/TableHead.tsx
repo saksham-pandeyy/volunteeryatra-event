@@ -8,24 +8,24 @@ const cn = clsx;
 export const SortIcon = ({ isSorted, isSortedDesc, isSorting }: any) => (
   <div className={cn("dt-sort-indicator", isSorted && "is-active", isSorting && "is-sorting")}>
     {isSorting ? (
-      <Loader2 size={12} className="dt-sort-spinner animate-spin" />
+      <Loader2 size={14} className="dt-sort-spinner animate-spin text-primary" />
     ) : (
-      <>
+      <div className="dt-sort-arrows">
         <ArrowUp
-          size={12}
+          size={11}
           className={cn(
             "dt-arrow dt-arrow-up",
             isSorted && !isSortedDesc && "active",
           )}
         />
         <ArrowDown
-          size={12}
+          size={11}
           className={cn(
             "dt-arrow dt-arrow-down",
             isSorted && isSortedDesc && "active",
           )}
         />
-      </>
+      </div>
     )}
   </div>
 );
@@ -38,6 +38,7 @@ export const TableHead = ({ table, stickyFirstColumn, stickyLastColumn, isSortin
           {headerGroup.headers.map((header: any, idx: number) => {
             const isFirst = idx === 0 && stickyFirstColumn;
             const isLast = header.column.id === "actions" && stickyLastColumn;
+            const isSorted = header.column.getIsSorted();
 
             return (
               <th
@@ -47,6 +48,7 @@ export const TableHead = ({ table, stickyFirstColumn, stickyLastColumn, isSortin
                   isFirst && "dt-th--sticky-left",
                   isLast && "dt-th--sticky-right",
                   header.column.getCanSort() && "dt-th--sortable",
+                  isSorted && "dt-th--sorted",
                 )}
                 style={{
                   width: header.getSize(),
@@ -54,41 +56,41 @@ export const TableHead = ({ table, stickyFirstColumn, stickyLastColumn, isSortin
                 }}
               >
                 <div className="dt-th-content">
-                  <div
-                    className={cn(
-                      "dt-th-group",
-                      header.column.getCanSort() && "dt-th--sortable",
-                    )}
+                  <span
+                    className="dt-label"
+                    onClick={header.column.getToggleSortingHandler()}
+                    title={header.column.getCanSort() ? `Sort by ${flexRender(header.column.columnDef.header, header.getContext())}` : undefined}
                   >
-                    <span
-                      className="dt-label"
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
+                  </span>
+
+                  {header.column.getCanSort() && (
+                    <div
+                      className={cn(
+                        "dt-header-actions",
+                        isSorted && "dt-header-actions--active",
+                      )}
                       onClick={header.column.getToggleSortingHandler()}
                     >
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                    </span>
-
-                    {header.column.getCanSort() && (
-                      <div
-                        className={cn(
-                          "dt-header-actions",
-                          header.column.getCanResize() && "dt-resizer",
-                        )}
-                        onMouseDown={header.getResizeHandler()}
-                        onTouchStart={header.getResizeHandler()}
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        <SortIcon
-                          isSorted={header.column.getIsSorted()}
-                          isSortedDesc={header.column.getIsSorted() === "desc"}
-                          isSorting={isSorting && !!header.column.getIsSorted()}
-                        />
-                      </div>
-                    )}
-                  </div>
+                      <SortIcon
+                        isSorted={isSorted}
+                        isSortedDesc={isSorted === "desc"}
+                        isSorting={isSorting && !!isSorted}
+                      />
+                    </div>
+                  )}
                 </div>
+
+                {header.column.getCanResize() && (
+                  <div
+                    className="dt-resize-handle"
+                    onMouseDown={header.getResizeHandler()}
+                    onTouchStart={header.getResizeHandler()}
+                  />
+                )}
               </th>
             );
           })}

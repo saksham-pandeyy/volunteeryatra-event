@@ -3,16 +3,17 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: var(--space-4);
+  gap: 1rem;
 }
 
 .dt-container {
   display: flex;
   flex-direction: column;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-base);
-  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-surface-border);
+  border-radius: 10px;
   overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 .dt-wrapper {
@@ -22,26 +23,59 @@
 }
 
 .dt-wrapper::-webkit-scrollbar {
-  height: 8px;
+  height: 6px;
 }
 
 .dt-wrapper::-webkit-scrollbar-track {
-  background: var(--bg-table-header);
+  background: var(--color-base-100);
 }
 
 .dt-wrapper::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: var(--radius-sm);
+  background: var(--color-surface-border);
+  border-radius: 3px;
 }
 
 .dt-wrapper::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--color-base-400);
+}
+
+/* Tooltip floating above table */
+.dt-tooltip-portal {
+  position: fixed;
+  z-index: 999999;
+  pointer-events: none;
+}
+
+.dt-tooltip-content {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  white-space: nowrap;
+  position: relative;
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-surface-border);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.dt-tooltip-arrow {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  border-right: 1px solid var(--color-surface-border);
+  border-bottom: 1px solid var(--color-surface-border);
 }
 
 @media print {
   .dt-container {
-    border: 1px solid var(--border-base);
+    border: 1px solid var(--color-surface-border);
   }
 }
-
 

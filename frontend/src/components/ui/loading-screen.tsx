@@ -43,22 +43,4 @@ export function LoadingScreen({ minimumDuration = 800 }: LoadingScreenProps) {
   );
 }
 
-export function NavigationLoader() {
-  const [show, setShow] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShow(true), 100);
-    return () => {
-      clearTimeout(timer);
-      setShow(false);
-    };
-  }, []);
-
-  if (!show) return null;
-
-  return (
-    <div className="fixed top-0 left-0 right-0 z-[9998] h-1 bg-surface-border overflow-hidden">
-      <div className="navigation-progress-bar" />
-    </div>
-  );
-}

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { notify } from "@/common/utils";
+import { uploadToStorage, STORAGE_BUCKETS } from "@/common/api/supabase";
 
 interface UseCoverUploadOptions {
   initialUrl?: string | null;
@@ -23,15 +24,8 @@ export function useCoverUpload({ initialUrl, onUrlChange }: UseCoverUploadOption
     setPreview(URL.createObjectURL(file));
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api"}/upload`,
-        { method: "POST", body: formData }
-      );
-      if (!res.ok) throw new Error("Upload failed");
-      const data = await res.json();
-      onUrlChange(data.url);
+      const publicUrl = await uploadToStorage(STORAGE_BUCKETS.covers, file);
+      onUrlChange(publicUrl);
       notify.success("Cover image uploaded");
     } catch {
       notify.error("Failed to upload cover image");

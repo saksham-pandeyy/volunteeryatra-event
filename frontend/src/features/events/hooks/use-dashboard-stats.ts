@@ -5,7 +5,7 @@ import type { DateRangeValue } from "@/components/ui/date-range-picker";
 import type { DashboardStats } from "@/common/types";
 
 export function useDashboardStats() {
-  const [dateRange, setDateRangeState] = useState<DateRangeValue>(() => getInitialRange("30d"));
+  const [dateRange, setDateRangeState] = useState<DateRangeValue>(() => getInitialRange("all"));
 
   const from = useMemo(() => dateRange.from.toISOString().split("T")[0], [dateRange.from]);
   const to = useMemo(() => dateRange.to.toISOString().split("T")[0], [dateRange.to]);
@@ -18,11 +18,12 @@ export function useDashboardStats() {
   const dateRangeLabel = useMemo(() => getDateRangeLabel(dateRange), [dateRange]);
 
   const trend = useMemo(() => {
-    if (!stats || stats.monthlyTrend.length < 2) return null;
-    const t = stats.monthlyTrend[stats.monthlyTrend.length - 1].count - stats.monthlyTrend[stats.monthlyTrend.length - 2].count;
+    if (!stats || stats.trend.length < 2) return null;
+    const t = stats.trend[stats.trend.length - 1].count - stats.trend[stats.trend.length - 2].count;
+    const intervalLabel = stats.trendInterval === "yearly" ? "this year" : stats.trendInterval === "daily" ? "today" : "this month";
     return {
       direction: t > 0 ? ("up" as const) : t < 0 ? ("down" as const) : ("neutral" as const),
-      value: `${Math.abs(t)}`,
+      value: `${Math.abs(t)} ${stats.trendInterval === "daily" ? "today" : "in " + intervalLabel}`,
     };
   }, [stats]);
 

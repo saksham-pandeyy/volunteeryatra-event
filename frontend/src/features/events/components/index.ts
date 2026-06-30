@@ -3,3 +3,6 @@ export { CreateEventForm } from "./create-event-form";
 export { EventDetailPage } from "./event-detail-page";
 export { EditEventForm } from "./edit-event-form";
 export { EventMap } from "./event-map";
+export { CoverUpload } from "./cover-upload";
+export { EventTable } from "./event-table";
+export { EditEventSkeleton } from "./edit-event-skeleton";

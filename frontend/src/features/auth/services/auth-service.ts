@@ -27,13 +27,13 @@ const authApi = baseApi.injectEndpoints({
       transformResponse: (res: ApiResponse<User>) => res.data,
       invalidatesTags: ["User"],
     }),
-    uploadAvatar: builder.mutation<User, FormData>({
-      query: (body) => ({ url: routes.auth.uploadAvatar, method: "POST", body }),
+    uploadAvatar: builder.mutation<User, { avatar_url: string }>({
+      query: (body) => ({ url: routes.auth.updateProfile, method: "PATCH", body }),
       transformResponse: (res: ApiResponse<User>) => res.data,
       invalidatesTags: ["User"],
     }),
     removeAvatar: builder.mutation<User, void>({
-      query: () => ({ url: routes.auth.removeAvatar, method: "DELETE" }),
+      query: () => ({ url: routes.auth.updateProfile, method: "PATCH", body: { avatar_url: null } }),
       transformResponse: (res: ApiResponse<User>) => res.data,
       invalidatesTags: ["User"],
     }),
