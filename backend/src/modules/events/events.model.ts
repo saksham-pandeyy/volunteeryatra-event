@@ -16,6 +16,7 @@ export interface EventFilters {
   sortAsc?: boolean;
   page?: number;
   limit?: number;
+  ownerId?: string;
 }
 
 export interface PaginatedResult<T> {
@@ -36,6 +37,10 @@ export async function findAllEvents(
   let countQuery = supabase.from("events").select("*", { count: "exact", head: true });
   let query = supabase.from("events").select("*");
 
+  if (filters.ownerId) {
+    countQuery = countQuery.eq("owner_id", filters.ownerId);
+    query = query.eq("owner_id", filters.ownerId);
+  }
   if (filters.name) {
     const pattern = "%" + filters.name + "%";
     countQuery = countQuery.ilike("name", pattern);
@@ -147,7 +152,7 @@ export async function deleteEvent(id: string): Promise<void> {
   if (error) throw new DatabaseError(error.message);
 }
 
-export async function getEventListStats(): Promise<{
+export async function getEventListStats(ownerId: string): Promise<{
   total: number;
   upcoming: number;
   past: number;
@@ -155,7 +160,8 @@ export async function getEventListStats(): Promise<{
 }> {
   const { data: events, error } = await supabase
     .from("events")
-    .select("date, location");
+    .select("date, location")
+    .eq("owner_id", ownerId);
 
   if (error) throw new DatabaseError(error.message);
 
@@ -168,8 +174,8 @@ export async function getEventListStats(): Promise<{
   return { total, upcoming, past, uniqueLocations };
 }
 
-export async function getDashboardStats(fromDate?: string, toDate?: string): Promise<DashboardStats> {
-  let query = supabase.from("events").select("*");
+export async function getDashboardStats(ownerId: string, fromDate?: string, toDate?: string): Promise<DashboardStats> {
+  let query = supabase.from("events").select("*").eq("owner_id", ownerId);
   if (fromDate) query = query.gte("date", fromDate);
   if (toDate) query = query.lte("date", toDate);
 
@@ -179,14 +185,20 @@ export async function getDashboardStats(fromDate?: string, toDate?: string): Pro
   const now = new Date();
   const totalUpcoming = events.filter((e) => new Date(e.date) > now).length;
 
-  // Fetch all participants (not filtered by date since they span events)
-  const { data: participants, error: pErr } = await supabase
-    .from("participants")
-    .select("id, status");
-  if (pErr) throw new DatabaseError(pErr.message);
+  const eventIds = events.map((e) => e.id);
+  let participants: { id: string; status: string }[] = [];
 
-  const totalParticipants = participants?.length || 0;
-  const pendingParticipants = participants?.filter((p) => p.status === "applied").length || 0;
+  if (eventIds.length > 0) {
+    const { data: pData, error: pErr } = await supabase
+      .from("participants")
+      .select("id, status")
+      .in("event_id", eventIds);
+    if (pErr) throw new DatabaseError(pErr.message);
+    participants = pData || [];
+  }
+
+  const totalParticipants = participants.length;
+  const pendingParticipants = participants.filter((p) => p.status === "applied").length;
 
   const byStatus = {
     backlog: events.filter((e) => e.status === "backlog").length,

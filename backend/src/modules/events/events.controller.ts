@@ -61,6 +61,7 @@ export async function list(
       sortAsc: parseQuery(req.query.sort) !== "desc",
       page: req.query.page ? Number(req.query.page) : undefined,
       limit: req.query.limit ? Number(req.query.limit) : undefined,
+      ownerId: req.userId!,
     };
     const result = await findAllEvents(filters);
     res.json({
@@ -167,12 +168,12 @@ export async function remove(
 }
 
 export async function listStats(
-  _req: AuthenticatedRequest,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ): Promise<void> {
   try {
-    const data = await getEventListStats();
+    const data = await getEventListStats(req.userId!);
     res.json({ success: true, data });
   } catch (error) {
     next(error);
@@ -187,7 +188,7 @@ export async function stats(
   try {
     const from = parseQuery(req.query.from);
     const to = parseQuery(req.query.to);
-    const data = await getDashboardStats(from, to);
+    const data = await getDashboardStats(req.userId!, from, to);
     res.json({ success: true, data });
   } catch (error) {
     next(error);
@@ -207,6 +208,7 @@ export async function exportCsv(
       status: parseQuery(req.query.status) as EventStatus | undefined,
       sortAsc: parseQuery(req.query.sort) !== "desc",
       limit: 99999,
+      ownerId: req.userId!,
     };
     const { data: events } = await findAllEvents(filters);
     
