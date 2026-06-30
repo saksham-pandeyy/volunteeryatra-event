@@ -52,6 +52,8 @@ export interface UpdateEventPayload extends Partial<CreateEventPayload> {}
 export interface EventFilters {
   name?: string;
   date?: string;
+  dateFrom?: string;
+  dateTo?: string;
   location?: string;
   status?: EventStatus;
   sortAsc?: boolean;

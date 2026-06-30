@@ -15,7 +15,7 @@ import { Plus, Calendar, MapPin, Clock, CalendarDays, AlertTriangle } from "luci
 
 export function EventListPage() {
   const router = useRouter();
-  const { events, isLoading, handleSearch, handleFilterDate, handleFilterStatus, handlePageChange, filters, pagination, page } = useEventList();
+  const { events, isLoading, handleSearch, handleFilterDateRange, handleFilterStatus, handlePageChange, filters, pagination, page } = useEventList();
   const [deleteEvent, { isLoading: deleteLoading }] = useDeleteEventMutation();
 
   const [deleteTarget, setDeleteTarget] = useState<Event | null>(null);
@@ -74,7 +74,7 @@ export function EventListPage() {
               filters={filters}
               handleSearch={handleSearch}
               handleFilterStatus={handleFilterStatus}
-              handleFilterDate={handleFilterDate}
+              handleFilterDateRange={handleFilterDateRange}
               onDeleteClick={setDeleteTarget}
               pagination={pagination}
               page={page}

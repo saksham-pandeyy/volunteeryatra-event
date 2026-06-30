@@ -9,6 +9,8 @@ export type EventStatus = SharedEventStatus;
 export interface EventFilters {
   name?: string;
   date?: string;
+  dateFrom?: string;
+  dateTo?: string;
   location?: string;
   status?: EventStatus;
   sortAsc?: boolean;
@@ -42,6 +44,14 @@ export async function findAllEvents(
   if (filters.date) {
     countQuery = countQuery.eq("date", filters.date);
     query = query.eq("date", filters.date);
+  }
+  if (filters.dateFrom) {
+    countQuery = countQuery.gte("date", filters.dateFrom);
+    query = query.gte("date", filters.dateFrom);
+  }
+  if (filters.dateTo) {
+    countQuery = countQuery.lte("date", filters.dateTo);
+    query = query.lte("date", filters.dateTo);
   }
   if (filters.location) {
     const pattern = "%" + filters.location + "%";

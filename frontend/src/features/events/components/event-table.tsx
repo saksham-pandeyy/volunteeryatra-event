@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { DataTable, createColumnHelper, Button, Select, DatePicker, StatusDropdown } from "@/components/ui";
+import { DataTable, createColumnHelper, Button, Select, DateRangePicker, type DateRangeValue, StatusDropdown } from "@/components/ui";
 import type { ColumnDef } from "@/components/ui";
 import type { Event, EventFilters } from "@/common/types";
 import { formatDate } from "@/common/utils";
@@ -13,7 +13,7 @@ interface EventTableProps {
   filters: EventFilters;
   handleSearch: (name: string) => void;
   handleFilterStatus: (status: string) => void;
-  handleFilterDate: (date: string) => void;
+  handleFilterDateRange: (range: DateRangeValue) => void;
   onDeleteClick: (event: Event) => void;
   pagination?: { total: number; page: number; limit: number; pages: number };
   page?: number;
@@ -27,7 +27,7 @@ export function EventTable({
   filters,
   handleSearch,
   handleFilterStatus,
-  handleFilterDate,
+  handleFilterDateRange,
   onDeleteClick,
   pagination,
   page = 1,
@@ -138,11 +138,14 @@ export function EventTable({
               placeholder="Filter Status"
             />
           </div>
-          <div className="w-[180px]">
-            <DatePicker
-              value={filters.date || ""}
-              onChange={handleFilterDate}
-              placeholder="Select Date"
+          <div className="w-[240px]">
+            <DateRangePicker
+              value={{
+                preset: filters.dateFrom ? "custom" : "all",
+                from: filters.dateFrom ? new Date(filters.dateFrom + "T00:00:00") : new Date("2020-01-01"),
+                to: filters.dateTo ? new Date(filters.dateTo + "T00:00:00") : new Date("2035-12-31"),
+              }}
+              onChange={handleFilterDateRange}
             />
           </div>
         </div>

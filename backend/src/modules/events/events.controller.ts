@@ -53,6 +53,8 @@ export async function list(
     const filters: EventFilters = {
       name: parseQuery(req.query.name),
       date: parseQuery(req.query.date),
+      dateFrom: parseQuery(req.query.dateFrom),
+      dateTo: parseQuery(req.query.dateTo),
       location: parseQuery(req.query.location),
       status: parseQuery(req.query.status) as EventStatus | undefined,
       sortAsc: parseQuery(req.query.sort) !== "desc",

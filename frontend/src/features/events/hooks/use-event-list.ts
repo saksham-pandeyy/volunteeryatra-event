@@ -1,6 +1,8 @@
 import { useState, useCallback } from "react";
 import { useListEventsQuery, useDeleteEventMutation } from "../services";
 import type { EventFilters, PaginationInfo } from "@/common/types";
+import type { DateRangeValue } from "@/components/ui";
+import { format } from "date-fns";
 
 export function useEventList() {
   const [filters, setFilters] = useState<EventFilters>({});
@@ -28,8 +30,19 @@ export function useEventList() {
     setPage(1);
   }, []);
 
-  const handleFilterDate = useCallback((date: string) => {
-    setFilters((prev) => ({ ...prev, date: date || undefined }));
+  const handleFilterDateRange = useCallback((range: DateRangeValue) => {
+    if (range.preset === "all") {
+      setFilters((prev) => {
+        const { dateFrom, dateTo, ...rest } = prev;
+        return rest;
+      });
+    } else {
+      setFilters((prev) => ({
+        ...prev,
+        dateFrom: format(range.from, "yyyy-MM-dd"),
+        dateTo: format(range.to, "yyyy-MM-dd"),
+      }));
+    }
     setPage(1);
   }, []);
 
@@ -61,7 +74,7 @@ export function useEventList() {
     filters,
     handleDelete,
     handleSearch,
-    handleFilterDate,
+    handleFilterDateRange,
     handleFilterStatus,
     handlePageChange,
     toggleSort,
