@@ -25,6 +25,7 @@ export interface EventRow {
   start_time: string | null;
   end_time: string | null;
   cover_image_url: string | null;
+  participant_count?: number;
 }
 
 export interface ParticipantRow {

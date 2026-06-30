@@ -19,7 +19,7 @@ export function useCreateEvent() {
     setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const result = createEventSchema.safeParse(form);
     if (!result.success) {
@@ -29,14 +29,16 @@ export function useCreateEvent() {
       return;
     }
     setErrors({});
-    try {
-      const newEvent = await createEvent(form).unwrap();
-      notify.success("Event created successfully!");
-      setTimeout(() => router.push(`/events/${newEvent.id}`), 300);
-    } catch (err: unknown) {
-      const error = err as { data?: { error?: { message?: string } } };
-      notify.error(error?.data?.error?.message || "Failed to create event");
-    }
+    createEvent(form)
+      .unwrap()
+      .then((newEvent) => {
+        notify.success("Event created successfully!");
+        router.push(`/events/${newEvent.id}`);
+      })
+      .catch((err: unknown) => {
+        const error = err as { data?: { error?: { message?: string } } };
+        notify.error(error?.data?.error?.message || "Failed to create event");
+      });
   };
 
   return { form, errors, isLoading, setField, handleSubmit };

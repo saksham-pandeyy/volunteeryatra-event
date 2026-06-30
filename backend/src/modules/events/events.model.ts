@@ -27,7 +27,7 @@ export interface PaginatedResult<T> {
   pages: number;
 }
 
-export async function findAllEvents(
+export function findAllEvents(
   filters: EventFilters
 ): Promise<PaginatedResult<EventRow>> {
   const page = filters.page ?? 1;
@@ -68,29 +68,72 @@ export async function findAllEvents(
     query = query.eq("status", filters.status);
   }
 
-  const { count, error: countError } = await countQuery;
-  if (countError) throw new DatabaseError(countError.message);
+  return countQuery
+    .then(({ count, error: countError }) => {
+      if (countError) throw new DatabaseError(countError.message);
 
-  const total = count ?? 0;
-  const pages = Math.ceil(total / limit);
+      const total = count ?? 0;
+      const pages = Math.ceil(total / limit);
 
-  const { data, error } = await query
-    .order("date", { ascending: filters.sortAsc ?? true })
-    .range(offset, offset + limit - 1);
+      return query
+        .order("date", { ascending: filters.sortAsc ?? true })
+        .range(offset, offset + limit - 1)
+        .then(({ data, error }) => {
+          if (error) throw new DatabaseError(error.message);
 
-  if (error) throw new DatabaseError(error.message);
-  return { data, total, page, limit, pages };
+          const events = data || [];
+          if (events.length === 0) {
+            return { data: events, total, page, limit, pages };
+          }
+
+          const eventIds = events.map((e) => e.id);
+          return supabase
+            .from("participants")
+            .select("event_id, status")
+            .in("event_id", eventIds)
+            .neq("status", "cancelled")
+            .then(({ data: pCountData, error: pCountError }) => {
+              if (pCountError) throw new DatabaseError(pCountError.message);
+
+              const countMap: Record<string, number> = {};
+              if (pCountData) {
+                pCountData.forEach((p) => {
+                  countMap[p.event_id] = (countMap[p.event_id] || 0) + 1;
+                });
+              }
+
+              events.forEach((event) => {
+                event.participant_count = countMap[event.id] || 0;
+              });
+
+              return { data: events, total, page, limit, pages };
+            });
+        });
+    });
 }
 
-export async function findEventById(id: string): Promise<EventRow | null> {
-  const { data, error } = await supabase
+export function findEventById(id: string): Promise<EventRow | null> {
+  return supabase
     .from("events")
     .select("*")
     .eq("id", id)
-    .single();
+    .single()
+    .then(({ data, error }) => {
+      if (error && error.code !== "PGRST116") throw new DatabaseError(error.message);
+      if (!data) return null;
 
-  if (error && error.code !== "PGRST116") throw new DatabaseError(error.message);
-  return data;
+      return supabase
+        .from("participants")
+        .select("*", { count: "exact", head: true })
+        .eq("event_id", id)
+        .neq("status", "cancelled")
+        .then(({ count, error: countError }) => {
+          if (!countError) {
+            data.participant_count = count ?? 0;
+          }
+          return data;
+        });
+    });
 }
 
 export async function createEvent(data: {

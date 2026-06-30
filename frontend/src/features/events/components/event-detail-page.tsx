@@ -107,26 +107,29 @@ export function EventDetailPage() {
   const [newParticipantName, setNewParticipantName] = useState("");
   const [newParticipantEmail, setNewParticipantEmail] = useState("");
 
-  const handleAddParticipant = async () => {
+  const handleAddParticipant = () => {
     if (!newParticipantName.trim() || !newParticipantEmail.trim()) {
       notify.error("Please enter both name and email");
       return;
     }
-    try {
-      await addParticipant({
-        eventId,
-        data: { name: newParticipantName.trim(), email: newParticipantEmail.trim() },
-      }).unwrap();
-      notify.success(`${newParticipantName.trim()} has been registered successfully!`);
-      setShowAddParticipantModal(false);
-      setNewParticipantName("");
-      setNewParticipantEmail("");
-    } catch (err: unknown) {
-      const message =
-        (err as { data?: { error?: { message?: string } } })?.data?.error?.message ||
-        "Failed to add participant.";
-      notify.error(message);
-    }
+    addParticipant({
+      eventId,
+      data: { name: newParticipantName.trim(), email: newParticipantEmail.trim() },
+    })
+      .unwrap()
+      .then(() => {
+        notify.success(`${newParticipantName.trim()} has been registered successfully!`);
+        setShowAddParticipantModal(false);
+        setNewParticipantName("");
+        setNewParticipantEmail("");
+        refetch();
+      })
+      .catch((err: unknown) => {
+        const message =
+          (err as { data?: { error?: { message?: string } } })?.data?.error?.message ||
+          "Failed to add participant.";
+        notify.error(message);
+      });
   };
 
   const handleDeleteConfirm = async () => {

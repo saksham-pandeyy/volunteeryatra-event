@@ -7,12 +7,12 @@ const participantsApi = baseApi.injectEndpoints({
     applyToEvent: builder.mutation<Participant, { eventId: string; data: ApplyToEventPayload }>({
       query: ({ eventId, data }) => ({ url: routes.participants.apply(eventId), method: "POST", body: data }),
       transformResponse: (res: ApiResponse<Participant>) => res.data,
-      invalidatesTags: (_r, _e, { eventId }) => ["Participants", { type: "Event", id: eventId }, "DashboardStats"],
+      invalidatesTags: (_r, _e, { eventId }) => ["Events", "Participants", { type: "Event", id: eventId }, "DashboardStats"],
     }),
     addParticipant: builder.mutation<Participant, { eventId: string; data: { name: string; email: string; user_id?: string } }>({
       query: ({ eventId, data }) => ({ url: routes.participants.add(eventId), method: "POST", body: data }),
       transformResponse: (res: ApiResponse<Participant>) => res.data,
-      invalidatesTags: (_r, _e, { eventId }) => ["Participants", { type: "Event", id: eventId }, "DashboardStats"],
+      invalidatesTags: (_r, _e, { eventId }) => ["Events", "Participants", { type: "Event", id: eventId }, "DashboardStats"],
     }),
     listParticipants: builder.query<Participant[], string>({
       query: (eventId) => routes.participants.list(eventId),
@@ -22,7 +22,7 @@ const participantsApi = baseApi.injectEndpoints({
     cancelParticipant: builder.mutation<Participant, { eventId: string; participantId: string; data: CancelRegistrationPayload }>({
       query: ({ eventId, participantId, data }) => ({ url: routes.participants.cancel(eventId, participantId), method: "DELETE", body: data }),
       transformResponse: (res: ApiResponse<Participant>) => res.data,
-      invalidatesTags: ["Participants"],
+      invalidatesTags: (_r, _e, { eventId }) => ["Events", "Participants", { type: "Event", id: eventId }, "DashboardStats"],
     }),
   }),
 });
