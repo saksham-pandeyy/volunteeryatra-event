@@ -11,6 +11,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (_req, res) => {
+  res.json({ success: true, data: { name: "Volunteer Yatra API", version: "1.0.0", health: "/api/health" } });
+});
+
 app.get("/api/health", (_req, res) => {
   res.json({ success: true, data: { status: "ok" } });
 });
