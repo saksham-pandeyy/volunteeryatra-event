@@ -30,7 +30,7 @@ export interface EventRow {
 export interface ParticipantRow {
   id: string;
   event_id: string;
-  user_id: string;
+  user_id: string | null;
   name: string;
   email: string;
   status: "applied" | "approved" | "cancelled";
@@ -45,6 +45,7 @@ export interface DashboardStats {
   pendingParticipants: number;
   avgPerEvent: number;
   byStatus: { backlog: number; in_progress: number; completed: number };
-  monthlyTrend: Array<{ label: string; count: number }>;
+  trend: Array<{ label: string; count: number }>;
+  trendInterval: "daily" | "monthly" | "yearly";
   dateRangeLabel: string;
 }

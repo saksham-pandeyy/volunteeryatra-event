@@ -9,6 +9,13 @@ const createSchema = z.object({
   description: z.string().optional(),
   date: z.string().min(1),
   location: z.string().optional(),
+  category: z.string().optional(),
+  status: z.enum(["backlog", "in_progress", "completed"]).optional(),
+  max_participants: z.number().int().positive().optional(),
+  registration_deadline: z.string().optional(),
+  start_time: z.string().optional(),
+  end_time: z.string().optional(),
+  cover_image_url: z.string().optional(),
 });
 
 const updateSchema = createSchema.partial();

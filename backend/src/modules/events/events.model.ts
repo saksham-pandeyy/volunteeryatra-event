@@ -12,24 +12,59 @@ export interface EventFilters {
   location?: string;
   status?: EventStatus;
   sortAsc?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
 }
 
 export async function findAllEvents(
   filters: EventFilters
-): Promise<EventRow[]> {
+): Promise<PaginatedResult<EventRow>> {
+  const page = filters.page ?? 1;
+  const limit = filters.limit ?? 50;
+  const offset = (page - 1) * limit;
+
+  let countQuery = supabase.from("events").select("*", { count: "exact", head: true });
   let query = supabase.from("events").select("*");
 
-  if (filters.name) query = query.ilike("name", `%${filters.name}%`);
-  if (filters.date) query = query.eq("date", filters.date);
-  if (filters.location) query = query.ilike("location", `%${filters.location}%`);
-  if (filters.status) query = query.eq("status", filters.status);
+  if (filters.name) {
+    const pattern = "%" + filters.name + "%";
+    countQuery = countQuery.ilike("name", pattern);
+    query = query.ilike("name", pattern);
+  }
+  if (filters.date) {
+    countQuery = countQuery.eq("date", filters.date);
+    query = query.eq("date", filters.date);
+  }
+  if (filters.location) {
+    const pattern = "%" + filters.location + "%";
+    countQuery = countQuery.ilike("location", pattern);
+    query = query.ilike("location", pattern);
+  }
+  if (filters.status) {
+    countQuery = countQuery.eq("status", filters.status);
+    query = query.eq("status", filters.status);
+  }
 
-  const { data, error } = await query.order("date", {
-    ascending: filters.sortAsc ?? true,
-  });
+  const { count, error: countError } = await countQuery;
+  if (countError) throw new DatabaseError(countError.message);
+
+  const total = count ?? 0;
+  const pages = Math.ceil(total / limit);
+
+  const { data, error } = await query
+    .order("date", { ascending: filters.sortAsc ?? true })
+    .range(offset, offset + limit - 1);
 
   if (error) throw new DatabaseError(error.message);
-  return data;
+  return { data, total, page, limit, pages };
 }
 
 export async function findEventById(id: string): Promise<EventRow | null> {
@@ -128,16 +163,57 @@ export async function getDashboardStats(fromDate?: string, toDate?: string): Pro
     completed: events.filter((e) => e.status === "completed").length,
   };
 
-  // Monthly trend for the filtered events
-  const monthlyCounts = new Array(12).fill(0);
+  // Determine trend grouping based on date range and actual data span
+  let trendInterval: "daily" | "monthly" | "yearly" = "monthly";
+
+  const uniqueYears = new Set(events.map((e) => new Date(e.date).getFullYear()));
+
+  if (fromDate && toDate) {
+    const from = new Date(fromDate);
+    const to = new Date(toDate);
+    const diffDays = (to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24);
+    if (diffDays > 365 && uniqueYears.size > 1) {
+      // Only use yearly if the actual data spans multiple years
+      trendInterval = "yearly";
+    } else if (diffDays <= 31) {
+      trendInterval = "daily";
+    }
+  } else {
+    // All time or open range — check how many unique years exist in the data
+    if (uniqueYears.size > 1) {
+      trendInterval = "yearly";
+    }
+    // If only 1 unique year, keep default "monthly"
+  }
+
+  // Compute trend data based on interval
+  const trendMap = new Map<string, number>();
   events.forEach((e) => {
-    const m = new Date(e.date).getMonth();
-    monthlyCounts[m]++;
+    const d = new Date(e.date);
+    let key: string;
+    if (trendInterval === "yearly") {
+      key = d.getFullYear().toString();
+    } else if (trendInterval === "daily") {
+      key = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    } else {
+      key = MONTH_LABELS[d.getMonth()];
+    }
+    trendMap.set(key, (trendMap.get(key) || 0) + 1);
   });
-  const currentMonth = now.getMonth();
-  const monthlyTrend = MONTH_LABELS
-    .map((label, i) => ({ label, count: monthlyCounts[i] }))
-    .slice(Math.max(0, currentMonth - 5), currentMonth + 1);
+
+  // Sort trend data chronologically
+  const sortKey: Record<string, number> = {};
+  if (trendInterval === "yearly") {
+    events.forEach((e) => { const y = new Date(e.date).getFullYear().toString(); if (!(y in sortKey)) sortKey[y] = parseInt(y); });
+  } else if (trendInterval === "daily") {
+    events.forEach((e) => { const d = new Date(e.date); const k = d.toLocaleDateString("en-US", { month: "short", day: "numeric" }); if (!(k in sortKey)) sortKey[k] = d.getTime(); });
+  } else {
+    MONTH_LABELS.forEach((m, i) => { sortKey[m] = i; });
+  }
+
+  const trend = Array.from(trendMap.entries())
+    .map(([label, count]) => ({ label, count }))
+    .sort((a, b) => (sortKey[a.label] || 0) - (sortKey[b.label] || 0));
 
   // Date range label
   let dateRangeLabel = "All time";
@@ -158,7 +234,8 @@ export async function getDashboardStats(fromDate?: string, toDate?: string): Pro
     pendingParticipants,
     avgPerEvent: events.length > 0 ? Math.round(totalParticipants / events.length) : 0,
     byStatus,
-    monthlyTrend,
+    trend,
+    trendInterval,
     dateRangeLabel,
   };
 }

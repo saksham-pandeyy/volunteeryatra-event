@@ -97,36 +97,8 @@ export async function updateProfile(
   }
 }
 
-export async function uploadAvatar(
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    if (!req.file) {
-      res.status(400).json({ success: false, error: { code: "BAD_REQUEST", message: "No file uploaded" } });
-      return;
-    }
-    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
-    const user = await updateUserProfile(req.userId!, { avatar_url: avatarUrl });
-    res.json({ success: true, data: user });
-  } catch (error) {
-    next(error);
-  }
-}
-
-export async function removeAvatar(
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  try {
-    const user = await updateUserProfile(req.userId!, { avatar_url: null });
-    res.json({ success: true, data: user });
-  } catch (error) {
-    next(error);
-  }
-}
+// Avatar images are uploaded directly to Supabase Storage from the frontend.
+// The `updateProfile` endpoint handles setting the avatar URL via the `avatar_url` field.
 
 const forgotPasswordSchema = z.object({
   email: z.string().email(),

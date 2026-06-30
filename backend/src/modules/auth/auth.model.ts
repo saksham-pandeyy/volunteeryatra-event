@@ -12,7 +12,7 @@ export async function createUser(
   const { data, error } = await supabase
     .from("users")
     .insert({ email, password: hashed, name })
-    .select("id, email, name, created_at")
+    .select("id, email, name, avatar_url, created_at")
     .single();
 
   if (error) throw new DatabaseError(error.message);

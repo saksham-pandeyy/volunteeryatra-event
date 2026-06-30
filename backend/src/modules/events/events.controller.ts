@@ -56,9 +56,20 @@ export async function list(
       location: parseQuery(req.query.location),
       status: parseQuery(req.query.status) as EventStatus | undefined,
       sortAsc: parseQuery(req.query.sort) !== "desc",
+      page: req.query.page ? Number(req.query.page) : undefined,
+      limit: req.query.limit ? Number(req.query.limit) : undefined,
     };
-    const events = await findAllEvents(filters);
-    res.json({ success: true, data: events });
+    const result = await findAllEvents(filters);
+    res.json({
+      success: true,
+      data: result.data,
+      pagination: {
+        total: result.total,
+        page: result.page,
+        limit: result.limit,
+        pages: result.pages,
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -179,15 +190,16 @@ export async function exportCsv(
       location: parseQuery(req.query.location),
       status: parseQuery(req.query.status) as EventStatus | undefined,
       sortAsc: parseQuery(req.query.sort) !== "desc",
+      limit: 99999,
     };
-    const events = await findAllEvents(filters);
+    const { data: events } = await findAllEvents(filters);
     
     const headers = ["Name","Description","Date","Location","Status","Category","Max Participants","Created At"];
     const rows = events.map((e) => [
-      `"${(e.name || "").replace(/"/g, """ )}"`,
-      `"${(e.description || "").replace(/"/g, """ )}"`,
+      `"${(e.name || "").replace(/"/g, '""')}"`,
+      `"${(e.description || "").replace(/"/g, '""')}"`,
       e.date,
-      `"${(e.location || "").replace(/"/g, """ )}"`,
+      `"${(e.location || "").replace(/"/g, '""')}"`,
       e.status,
       e.category,
       e.max_participants?.toString() || "",
