@@ -30,9 +30,9 @@ export function useCreateEvent() {
     }
     setErrors({});
     try {
-      await createEvent(form).unwrap();
+      const newEvent = await createEvent(form).unwrap();
       notify.success("Event created successfully!");
-      setTimeout(() => router.push("/events"), 300);
+      setTimeout(() => router.push(`/events/${newEvent.id}`), 300);
     } catch (err: unknown) {
       const error = err as { data?: { error?: { message?: string } } };
       notify.error(error?.data?.error?.message || "Failed to create event");

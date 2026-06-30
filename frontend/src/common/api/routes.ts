@@ -10,6 +10,7 @@ export const routes = {
   events: {
     list: "/events",
     create: "/events",
+    listStats: "/events/list-stats",
     stats: "/events/stats",
     exportCsv: "/events/export/csv",
     byId: (eventId: string) => `/events/${eventId}`,

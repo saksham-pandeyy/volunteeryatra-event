@@ -147,6 +147,27 @@ export async function deleteEvent(id: string): Promise<void> {
   if (error) throw new DatabaseError(error.message);
 }
 
+export async function getEventListStats(): Promise<{
+  total: number;
+  upcoming: number;
+  past: number;
+  uniqueLocations: number;
+}> {
+  const { data: events, error } = await supabase
+    .from("events")
+    .select("date, location");
+
+  if (error) throw new DatabaseError(error.message);
+
+  const now = new Date();
+  const total = events.length;
+  const upcoming = events.filter((e) => new Date(e.date) > now).length;
+  const past = total - upcoming;
+  const uniqueLocations = new Set(events.map((e) => e.location).filter(Boolean)).size;
+
+  return { total, upcoming, past, uniqueLocations };
+}
+
 export async function getDashboardStats(fromDate?: string, toDate?: string): Promise<DashboardStats> {
   let query = supabase.from("events").select("*");
   if (fromDate) query = query.gte("date", fromDate);

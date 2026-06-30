@@ -79,6 +79,13 @@ export interface ListEventsResponse {
   pagination?: PaginationInfo;
 }
 
+export interface EventListStats {
+  total: number;
+  upcoming: number;
+  past: number;
+  uniqueLocations: number;
+}
+
 export interface DashboardStats {
   totalEvents: number;
   totalUpcoming: number;

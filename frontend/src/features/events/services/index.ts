@@ -5,5 +5,6 @@ export {
   useUpdateEventMutation,
   useUpdateEventStatusMutation,
   useDeleteEventMutation,
+  useGetEventListStatsQuery,
   useGetDashboardStatsQuery,
 } from "./event-service";

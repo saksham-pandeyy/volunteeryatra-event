@@ -1,5 +1,5 @@
 import { baseApi, routes, transformResponse } from "@/common/api";
-import type { Event, EventStatus, CreateEventPayload, UpdateEventPayload, EventFilters, DashboardStats, PaginatedResult } from "@/common/types";
+import type { Event, EventStatus, CreateEventPayload, UpdateEventPayload, EventFilters, EventListStats, DashboardStats, PaginatedResult } from "@/common/types";
 import type { ApiResponse } from "@/common/types";
 
 const eventsApi = baseApi.injectEndpoints({
@@ -37,6 +37,11 @@ const eventsApi = baseApi.injectEndpoints({
       transformResponse: (res: ApiResponse<null>) => { res; },
       invalidatesTags: ["Events", "DashboardStats"],
     }),
+    getEventListStats: builder.query<EventListStats, void>({
+      query: () => routes.events.listStats,
+      transformResponse: (res: ApiResponse<EventListStats>) => res.data,
+      providesTags: ["Events"],
+    }),
     getDashboardStats: builder.query<DashboardStats, { from?: string; to?: string }>({
       query: (params) => ({ url: routes.events.stats, params }),
       transformResponse: (res: ApiResponse<DashboardStats>) => res.data,
@@ -45,4 +50,4 @@ const eventsApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useListEventsQuery, useGetEventQuery, useCreateEventMutation, useUpdateEventMutation, useUpdateEventStatusMutation, useDeleteEventMutation, useGetDashboardStatsQuery } = eventsApi;
+export const { useListEventsQuery, useGetEventQuery, useCreateEventMutation, useUpdateEventMutation, useUpdateEventStatusMutation, useDeleteEventMutation, useGetEventListStatsQuery, useGetDashboardStatsQuery } = eventsApi;

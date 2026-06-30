@@ -8,6 +8,7 @@ import {
   updateEvent,
   deleteEvent,
   updateEventStatus,
+  getEventListStats,
   getDashboardStats,
 } from "./events.model";
 import { NotFoundError, ForbiddenError } from "../../shared/errors";
@@ -160,6 +161,19 @@ export async function remove(
     }
     await deleteEvent(eventId);
     res.json({ success: true, data: null });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function listStats(
+  _req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const data = await getEventListStats();
+    res.json({ success: true, data });
   } catch (error) {
     next(error);
   }

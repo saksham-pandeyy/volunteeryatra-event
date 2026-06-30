@@ -3,19 +3,19 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useEventList } from "../hooks";
-import { useDeleteEventMutation } from "../services";
+import { useGetEventListStatsQuery, useDeleteEventMutation } from "../services";
 import { SetPageMeta } from "@/components/layouts/page-meta-context";
 import { Button, SkeletonTable, StatsCard, Modal, SkeletonStatCard } from "@/components/ui";
 import { EventTable } from "./event-table";
 import { notify } from "@/common/utils";
 
-import { isUpcoming } from "@/common/utils";
 import type { Event } from "@/common/types";
 import { Plus, Calendar, MapPin, Clock, CalendarDays, AlertTriangle } from "lucide-react";
 
 export function EventListPage() {
   const router = useRouter();
   const { events, isLoading, handleSearch, handleFilterDateRange, handleFilterStatus, handlePageChange, filters, pagination, page } = useEventList();
+  const { data: listStats, isLoading: statsLoading } = useGetEventListStatsQuery();
   const [deleteEvent, { isLoading: deleteLoading }] = useDeleteEventMutation();
 
   const [deleteTarget, setDeleteTarget] = useState<Event | null>(null);
@@ -31,10 +31,10 @@ export function EventListPage() {
     }
   };
 
-  const upcoming = events.filter((e) => isUpcoming(e.date)).length;
-  const total = events.length;
-  const past = total - upcoming;
-  const uniqueLocations = new Set(events.map((e) => e.location).filter(Boolean)).size;
+  const total = listStats?.total ?? 0;
+  const upcoming = listStats?.upcoming ?? 0;
+  const past = listStats?.past ?? 0;
+  const uniqueLocations = listStats?.uniqueLocations ?? 0;
 
   return (
     <>
